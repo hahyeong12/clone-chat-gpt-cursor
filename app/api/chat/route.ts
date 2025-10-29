@@ -1,5 +1,7 @@
 export const runtime = "nodejs";
-import { generateStream, type Message } from "@/lib/ai";
+import { generateMedicationResponse } from "@/lib/medication-ai";
+import { getUserProfile } from "@/lib/user-profile";
+import type { Message } from "@/lib/ai";
 
 type ChatRequestBody = {
   messages: Message[];
@@ -7,6 +9,7 @@ type ChatRequestBody = {
   temperature?: number;
   max_tokens?: number;
   system?: string;
+  userId?: string; // 사용자 ID 추가
 };
 
 export async function POST(req: Request) {
@@ -25,16 +28,16 @@ export async function POST(req: Request) {
       start(controller) {
         (async () => {
           try {
-            const rawModel = body.model || process.env.DEFAULT_MODEL || "gpt-4o-mini";
-            const normalizedModel = rawModel.replace(/^openai:/, "");
-
-            for await (const token of generateStream({
-              messages: body.messages,
-              model: normalizedModel,
-              temperature: body.temperature,
-              max_tokens: body.max_tokens,
-              system: body.system,
-            })) {
+            // 의약품 추천 모드
+            const lastMessage = body.messages[body.messages.length - 1];
+            const userProfile = body.userId ? getUserProfile(body.userId) : undefined;
+            
+            const responseStream = generateMedicationResponse(
+              lastMessage.content,
+              userProfile
+            );
+            
+            for await (const token of responseStream) {
               controller.enqueue(encoder.encode(`data: ${token}\n\n`));
             }
             controller.enqueue(encoder.encode(`data: [DONE]\n\n`));

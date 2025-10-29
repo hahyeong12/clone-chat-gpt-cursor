@@ -32,6 +32,7 @@ export async function sendChat(body: {
   temperature?: number;
   max_tokens?: number;
   system?: string;
+  userId?: string;
 }) {
   const res = await fetch("/api/chat", {
     method: "POST",
