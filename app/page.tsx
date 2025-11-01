@@ -9,13 +9,18 @@ import { sendChat, type ClientMessage } from "@/lib/stream";
 import { LoginDialog } from "@/components/login-dialog";
 import { initializeTestUsers, type UserProfile, getOrCreateGoogleUser, getUserProfile } from "@/lib/user-profile";
 import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
+import { useChat } from "@/lib/chat-context";
+import { SpinningPill } from "@/components/ui/spinning-pill";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { formatAssistantResponse } from "@/lib/utils";
 
 export default function Home() {
-  const [messages, setMessages] = useState<{ id: string; role: ClientMessage["role"]; content: string }[]>([]);
+  const { messages, setMessages } = useChat(); // 전역 상태 사용
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
-  const listRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null); // viewportRef 추가
   const { data: session, status } = useSession();
 
   useEffect(() => {
@@ -39,7 +44,7 @@ export default function Home() {
           setMessages([{
             id: crypto.randomUUID(),
             role: "assistant",
-            content: `안녕하세요, ${userProfile.username}님! 약장수 챗봇입니다. 어떤 증상으로 불편하신가요?`
+            content: `안녕하세요, ${userProfile.username}님! 약장수입니다. 어떤 증상으로 불편하신가요?`
           }]);
         }
       }
@@ -47,14 +52,15 @@ export default function Home() {
       // 로그아웃 상태면 사용자 정보 초기화
       if (currentUser) {
         setCurrentUser(null);
-        setMessages([]);
+        // 로그아웃 시 메시지 초기화 (선택적)
+        // setMessages([]); 
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, status]);
 
   useEffect(() => {
-    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
+    viewportRef.current?.scrollTo({ top: viewportRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
   async function onSend() {
@@ -109,7 +115,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center px-4 py-8 gap-4 bg-gradient-to-b from-[#ede9fe] to-white text-foreground">
+    <div className="h-screen flex flex-col items-center px-4 py-6 gap-4 bg-gradient-to-b from-[#ede9fe] to-white text-foreground">
       {/* 헤더에 사이트 이동 버튼 추가 */}
       <Link href="/home" className="absolute top-4 right-4">
         <button className="bg-white text-[#7c3aed] px-4 py-2 rounded-lg border border-[#e5e7eb] hover:bg-gray-50 transition-colors">
@@ -117,12 +123,11 @@ export default function Home() {
         </button>
       </Link>
 
-      <main className="w-full max-w-2xl flex-1 flex flex-col border border-[#e5e7eb] rounded-2xl p-4 bg-white shadow-sm">
+      <main className="w-full max-w-2xl flex-1 flex flex-col border border-[#e5e7eb] rounded-2xl p-4 bg-white shadow-sm min-h-0">
         <header className="flex items-center justify-between pb-3 border-b border-[#2a2a3d] mb-3">
           <div className="flex flex-col">
             <div className="flex items-center">
-              <Image src="/assets/pill.png" alt="pill" width={28} height={28} />
-              <div className="font-semibold ml-3">약장수 챗봇
+              <div className="font-semibold">💊 약장수
                 <span className="ml-2 text-xs text-green-400">● Active</span>
               </div>
             </div>
@@ -148,25 +153,33 @@ export default function Home() {
           </div>
         </header>
 
-        <ScrollArea className="flex-1">
-          <div ref={listRef} className="pr-2">
+        <ScrollArea className="flex-1 min-h-0" viewportRef={viewportRef}>
+          <div className="pr-2">
             <div className="space-y-3">
               {messages.map((m) => (
                 <div key={m.id} className={m.role === "user" ? "flex justify-end" : "flex items-start"}>
                   {m.role === "assistant" && (
-                    <div className="mr-3">
-                      <Image src="/assets/robot-pharmacist.png" alt="robot pharmacist" width={40} height={40} className="rounded-md" />
+                    <div className="mr-3 text-2xl">
+                      🤖
                     </div>
                   )}
                   <div
                     className={
-                      "inline-block rounded-2xl px-4 py-3 max-w-[85%] whitespace-pre-wrap break-words " +
+                      "markdown-content inline-block rounded-2xl px-4 py-3 max-w-[85%] whitespace-pre-wrap break-words " +
                       (m.role === "user"
                         ? "bg-[#7c3aed] text-white shadow-[0_8px_24px_-8px_rgba(124,58,237,0.4)]"
                         : "bg-[#f3f4f6] text-[#111827] border border-[#e5e7eb]")
                     }
                   >
-                    {m.content || (m.role === "assistant" && loading ? "..." : "")}
+                    {m.role === "user" && m.content}
+                    {m.role === "assistant" && m.content ? (
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {formatAssistantResponse(m.content)}
+                      </ReactMarkdown>
+                    ) : null}
+                    {m.role === "assistant" && !m.content && loading && (
+                      <SpinningPill />
+                    )}
                   </div>
                   {m.role === "user" && <div className="w-10" />}
                 </div>
