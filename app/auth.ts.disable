@@ -1,0 +1,15 @@
+// 파일 경로: src/auth.ts (또는 /auth.ts)
+import NextAuth from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+
+export const { handlers, signIn, signOut, auth } = NextAuth({
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "YOUR_GOOGLE_CLIENT_SECRET",
+    }),
+  ],
+
+  // 🟢 디버그용 secret 하드코딩
+  secret: process.env.NEXTAUTH_SECRET || "temp-debug-secret-1234567890",
+});
