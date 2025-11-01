@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { medications } from "@/lib/medications";
+import { MedicationCard } from "@/components/medication-card";
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -86,38 +87,7 @@ export default function HomePage() {
         {/* 약물 카드 그리드 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredMedications.map(med => (
-            <div
-              key={med.id}
-              className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow"
-            >
-              <div className="mb-3">
-                <h3 className="text-xl font-semibold text-[#111827] mb-1">{med.name}</h3>
-                <span className="text-sm text-[#7c3aed] bg-purple-50 px-3 py-1 rounded-full">
-                  {med.category}
-                </span>
-              </div>
-
-              <div className="mb-4">
-                <div className="text-sm font-medium text-gray-700 mb-2">처리 가능한 증상:</div>
-                <div className="text-sm text-gray-600">
-                  {med.symptoms.join(", ")}
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <div className="text-sm font-medium text-gray-700 mb-1">용법:</div>
-                <div className="text-sm text-gray-600">{med.dosage}</div>
-              </div>
-
-              {med.warnings.length > 0 && (
-                <div className="pt-3 border-t border-gray-100">
-                  <div className="text-sm font-medium text-orange-600 mb-1">⚠️ 주의사항:</div>
-                  <div className="text-xs text-gray-600">
-                    {med.warnings.join(", ")}
-                  </div>
-                </div>
-              )}
-            </div>
+            <MedicationCard key={med.id} med={med} />
           ))}
         </div>
 
