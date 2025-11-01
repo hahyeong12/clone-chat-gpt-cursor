@@ -95,19 +95,19 @@ export const symptomCategories: SymptomCategory[] = [
         id: "neck-stiffness",
         title: "목이 뻣뻣할 때",
         description: "목 경직, 움직임 불편",
-        medications: ["med_005", "med_009"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "neck-muscle-pain",
         title: "목 근육이 아플 때",
         description: "목 근육통, 뒷목 뻐근함",
-        medications: ["med_005", "med_009"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "neck-cervical-pain",
         title: "경추가 아플 때",
         description: "경추 디스크, 목 척추 통증",
-        medications: ["med_005", "med_009"]
+        medications: ["med_009", "med_001"]
       }
     ]
   },
@@ -122,19 +122,19 @@ export const symptomCategories: SymptomCategory[] = [
         id: "shoulder-stiffness",
         title: "어깨가 결릴 때",
         description: "오십견, 어깨 결림, 어깨 뻐근함",
-        medications: ["med_005", "med_009"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "shoulder-joint-pain",
         title: "어깨 관절이 아플 때",
         description: "어깨 관절 통증, 회전근개 손상",
-        medications: ["med_009", "med_005"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "shoulder-muscle-pain",
         title: "어깨 근육이 아플 때",
         description: "어깨 근육통, 어깨 근육 피로",
-        medications: ["med_005", "med_009"]
+        medications: ["med_009", "med_001"]
       }
     ]
   },
@@ -148,19 +148,19 @@ export const symptomCategories: SymptomCategory[] = [
         id: "arm-muscle-pain",
         title: "팔 근육이 아플 때",
         description: "팔 근육통, 근육 피로",
-        medications: ["med_005", "med_009"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "arm-elbow-pain",
         title: "팔꿈치가 아플 때",
         description: "테니스 엘보, 골프 엘보, 팔꿈치 관절 통증",
-        medications: ["med_009", "med_005"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "arm-upper-pain",
         title: "팔 윗부분이 아플 때",
         description: "상완 통증, 팔 윗부분 근육통",
-        medications: ["med_005", "med_009"]
+        medications: ["med_009", "med_001"]
       }
     ]
   },
@@ -174,13 +174,13 @@ export const symptomCategories: SymptomCategory[] = [
         id: "chest-acid",
         title: "가슴이 쓰릴 때",
         description: "위산 역류로 인한 가슴 쓰림",
-        medications: ["med_008", "med_003"]
+        medications: ["med_005", "med_008"]
       },
       {
         id: "chest-tightness",
         title: "가슴이 답답할 때",
-        description: "호흡 곤란, 가슴 압박감",
-        medications: ["med_008", "med_004"]
+        description: "호흡 곤란, 가슴 압박감 - 심한 경우 즉시 의사 상담 필요",
+        medications: ["med_001"]
       }
     ]
   },
@@ -196,31 +196,31 @@ export const symptomCategories: SymptomCategory[] = [
         id: "spine-cervical",
         title: "목 부분 척추가 아플 때",
         description: "경추 통증, 목 척추 디스크",
-        medications: ["med_005", "med_009"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "back-upper-pain",
         title: "등 윗부분이 아플 때",
         description: "흉추 통증, 등 윗부분 근육통, 뻐근함, 어깨 결림",
-        medications: ["med_005", "med_009"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "back-middle-pain",
         title: "등 중간이 아플 때",
         description: "등 중간 근육통, 척추 주변 통증",
-        medications: ["med_005", "med_009"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "back-lower-pain",
         title: "허리가 아플 때",
         description: "요추 통증, 요통, 허리 디스크",
-        medications: ["med_005", "med_009"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "back-whole-pain",
         title: "척추 전체가 아플 때",
         description: "척추 전체 통증, 등 전체 근육통",
-        medications: ["med_005", "med_009"]
+        medications: ["med_009", "med_001"]
       }
     ]
   },
@@ -247,7 +247,7 @@ export const symptomCategories: SymptomCategory[] = [
         id: "stomach-acid",
         title: "속이 쓰릴 때",
         description: "위산과다, 속쓰림",
-        medications: ["med_008", "med_003"]
+        medications: ["med_005", "med_008"]
       },
       {
         id: "stomach-nausea",
@@ -399,25 +399,25 @@ export const symptomCategories: SymptomCategory[] = [
         id: "leg-knee-pain",
         title: "무릎이 아플 때",
         description: "무릎 관절 통증, 무릎 부위 아픔",
-        medications: ["med_009", "med_005"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "leg-muscle-pain",
         title: "다리 근육이 아플 때",
         description: "종아리, 허벅지 근육통",
-        medications: ["med_005", "med_009"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "leg-joint-pain",
         title: "다리 관절이 아플 때",
         description: "발목, 무릎 관절 통증",
-        medications: ["med_009", "med_005"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "leg-numbness",
         title: "다리가 저릴 때",
         description: "저림, 마비감, 혈행 불량",
-        medications: ["med_005", "med_016"]
+        medications: ["med_001", "med_016"]
       }
     ]
   },
@@ -431,19 +431,19 @@ export const symptomCategories: SymptomCategory[] = [
         id: "foot-ankle-pain",
         title: "발목이 아플 때",
         description: "발목 통증, 발목 염좌",
-        medications: ["med_009", "med_005"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "foot-sole-pain",
         title: "발바닥이 아플 때",
         description: "족저근막염, 발바닥 통증",
-        medications: ["med_009", "med_005"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "foot-toe-pain",
         title: "발가락이 아플 때",
         description: "발가락 관절 통증, 염좌",
-        medications: ["med_009", "med_005"]
+        medications: ["med_009", "med_001"]
       }
     ]
   },
@@ -457,19 +457,19 @@ export const symptomCategories: SymptomCategory[] = [
         id: "hand-joint-pain",
         title: "손 관절이 아플 때",
         description: "손목, 손가락 관절 통증",
-        medications: ["med_009", "med_005"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "hand-wrist-pain",
         title: "손목이 아플 때",
         description: "손목 통증, 손목 인대 염좌",
-        medications: ["med_009", "med_005"]
+        medications: ["med_009", "med_001"]
       },
       {
         id: "hand-numbness",
         title: "손이 저릴 때",
         description: "손 저림, 손목터널증후군",
-        medications: ["med_005", "med_016"]
+        medications: ["med_001", "med_016"]
       }
     ]
   },
@@ -527,25 +527,25 @@ export const symptomCategories: SymptomCategory[] = [
         id: "eye-dryness",
         title: "눈이 건조할 때",
         description: "안구건조증, 눈 피로, 시력 저하",
-        medications: ["med_020", "med_021"]
+        medications: ["med_020"]
       },
       {
         id: "eye-conjunctivitis",
         title: "결막염이 있을 때",
-        description: "눈 충혈, 눈물, 가려움, 분비물",
-        medications: ["med_021", "med_020"]
+        description: "눈 충혈, 눈물, 가려움, 분비물 - 세균성 결막염은 의사 처방 필요",
+        medications: ["med_020", "med_007"]
       },
       {
         id: "eye-fatigue",
         title: "눈이 피로할 때",
         description: "컴퓨터 시야증후군, 눈 피로감",
-        medications: ["med_020", "med_021"]
+        medications: ["med_020"]
       },
       {
         id: "eye-itchy",
         title: "눈이 가려울 때",
         description: "알레르기성 결막염, 눈 가려움",
-        medications: ["med_021", "med_007"]
+        medications: ["med_007", "med_020"]
       }
     ]
   },
@@ -595,8 +595,8 @@ export const symptomCategories: SymptomCategory[] = [
       {
         id: "eczema-wet",
         title: "습한 습진",
-        description: "진물, 염증, 감염 우려",
-        medications: ["med_024", "med_025"]
+        description: "진물, 염증, 감염 우려 - 감염 시 의사 처방 필요",
+        medications: ["med_024", "med_007"]
       }
     ]
   },
@@ -621,8 +621,8 @@ export const symptomCategories: SymptomCategory[] = [
       {
         id: "vaginal-discharge",
         title: "질 분비물이 이상할 때",
-        description: "질염 의심, 분비물 증가, 냄새",
-        medications: ["med_026", "med_027"]
+        description: "질염 의심, 분비물 증가, 냄새 - 의사 진단 및 처방 권장",
+        medications: ["med_026"]
       }
     ]
   },
@@ -635,14 +635,14 @@ export const symptomCategories: SymptomCategory[] = [
       {
         id: "depression",
         title: "우울감이 있을 때",
-        description: "우울한 기분, 의욕 상실, 무기력",
-        medications: ["med_028", "med_017"]
+        description: "우울한 기분, 의욕 상실, 무기력 - 심한 경우 의사 상담 및 처방 필요",
+        medications: ["med_017"]
       },
       {
         id: "anxiety",
         title: "불안이 심할 때",
-        description: "불안감, 초조함, 걱정 과다",
-        medications: ["med_017", "med_028"]
+        description: "불안감, 초조함, 걱정 과다 - 심한 경우 의사 상담 및 처방 필요",
+        medications: ["med_017"]
       },
       {
         id: "stress-severe",
@@ -653,8 +653,8 @@ export const symptomCategories: SymptomCategory[] = [
       {
         id: "panic",
         title: "공황 증상이 있을 때",
-        description: "공황발작, 호흡곤란, 두근거림",
-        medications: ["med_017", "med_028"]
+        description: "공황발작, 호흡곤란, 두근거림 - 즉시 의사 상담 및 처방 필요",
+        medications: ["med_017"]
       }
     ]
   },
@@ -704,9 +704,9 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
   },
   "med_002": {
     id: "med_002",
-    name: "부스코판정",
+    name: "게보린정",
     category: "진통제/소염제",
-    characteristics: "부파레놀과 카페인 복합제로 심한 두통과 생리통에 효과적이며, 카페인으로 효과가 빠르게 나타납니다.",
+    characteristics: "이부프로펜, 아세트아미노펜, 카페인 복합제로 심한 두통과 생리통에 효과적이며, 카페인으로 효과가 빠르게 나타납니다.",
     comparisonNote: "심한 두통이나 생리통이 있을 때 효과가 빠르고 강력합니다. 하지만 위장 장애 위험이 있고, 저녁 복용 시 불면증을 유발할 수 있어 주의가 필요합니다.",
     effects: [
       "중증 두통 완화",
@@ -732,7 +732,7 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
       "카페인 민감자는 저녁 복용 피하기",
       "연속 복용 시 10일 이내 권장"
     ],
-    ingredients: ["부파레놀", "카페인"],
+    ingredients: ["이부프로펜", "아세트아미노펜", "카페인"],
     duration: "복용 후 20-30분에 효과 시작, 4-6시간 지속",
     ageRestrictions: {
       infant: "유아기(0-2세) 복용 금지. 카페인 성분으로 인해 신경계 자극 위험",
@@ -829,80 +829,79 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
   "med_005": {
     id: "med_005",
     name: "겔포스정",
-    category: "근육이완제",
-    characteristics: "근육 긴장 완화제로 근육통과 관절통에 효과적이며, 근육 경련을 완화합니다.",
-    comparisonNote: "근육통과 관절통에 효과가 뛰어나고 근육 이완 효과가 좋습니다. 하지만 졸음이 오므로 운전이나 위험한 작업 전 복용은 절대 금지입니다.",
+    category: "제산제",
+    characteristics: "알루미늄, 마그네슘 복합 제산제로 속쓰림과 위산과다에 즉각적인 효과를 보이며, 위장 벽을 보호합니다.",
+    comparisonNote: "속쓰림에 즉각적이고 빠른 효과를 보입니다. 부작용이 거의 없고 맛도 부드러워 속 편하게 복용할 수 있지만, 변비 경향이 있는 분은 과다복용을 피해야 합니다.",
     effects: [
-      "근육통 완화",
-      "근육 경련 완화",
-      "관절통 완화",
-      "어깨, 목, 허리 통증 완화"
+      "위산 중화",
+      "속쓰림 완화",
+      "위장 보호",
+      "소화 불량 완화"
     ],
     dosage: {
-      method: "물과 함께 복용",
-      timing: "식후 30분",
-      frequency: "1회 1정, 1일 2-3회"
+      method: "씹어서 복용 또는 물과 함께 복용",
+      timing: "식후 1시간 또는 속쓰림 시",
+      frequency: "1회 1정, 필요시 1일 최대 6정"
     },
     sideEffects: [
-      "졸음 (일반적)",
-      "어지러움",
-      "드물게 구강건조",
-      "드물게 두통"
+      "변비 (과다복용 시)",
+      "드물게 구토",
+      "드물게 알레르기 반응"
     ],
     precautions: [
-      "운전 전 복용 절대 금지",
-      "중추신경계 약물과 함께 복용 시 주의",
-      "알코올과 함께 복용 금지",
-      "장기간 복용 시 의사 상담 필요"
+      "변비 경향이 있는 분은 사용량 제한",
+      "다른 약과 2시간 간격 두고 복용",
+      "신장 질환 환자는 의사 상담 필요",
+      "장기간 사용 시 의사 상담 필요"
     ],
-    ingredients: ["클로르족사존"],
-    duration: "복용 후 1-2시간에 효과 시작, 6-8시간 지속",
+    ingredients: ["알루미늄", "마그네슘"],
+    duration: "복용 즉시 효과 시작, 2-3시간 지속",
     ageRestrictions: {
-      infant: "유아기(0-2세) 복용 금지. 졸음 부작용이 과도함",
-      child: "소아기(3-12세)는 용량 조절 필요하며 의사 상담 필수",
-      elderly: "노년기(65세 이상)는 졸음으로 인한 낙상 위험 매우 높음. 용량 50% 감소 필수"
+      infant: "유아기(0-2세)는 사용 가능하나 용량 조절 필요",
+      child: "소아기(3-12세)는 사용 가능하며 안전",
+      elderly: "노년기(65세 이상)는 신장 기능 저하 시 알루미늄 축적 위험, 변비 주의 필요"
     },
     ageAlternatives: {
-      infant: ["med_001"], // 유아기에는 타이레놀 추천
-      elderly: ["med_001"] // 노년기에는 졸음 적은 타이레놀 추천
+      infant: ["med_008"], // 유아기에도 사용 가능
+      elderly: ["med_008"] // 노년기에도 사용 가능하나 주의 필요
     }
   },
   "med_006": {
     id: "med_006",
-    name: "필로덤정",
+    name: "멜라토닌정",
     category: "수면보조제",
-    characteristics: "단기간 불면증 치료에 사용되는 수면 유도제로 빠른 수면 유도 효과가 있습니다.",
-    comparisonNote: "불면증에 즉각적이고 확실한 효과를 보입니다. 하지만 의존성이 생기기 쉬우며, 다음날 잔여 효과(졸음)가 있어 장기 복용은 피해야 합니다.",
+    characteristics: "자연 수면 호르몬 보충제로 수면 주기를 조절하고 수면의 질을 향상시킵니다. 처방전 없이 구입 가능한 일반의약품입니다.",
+    comparisonNote: "불면증에 안전하고 자연스러운 효과를 보입니다. 의존성이 거의 없고 다음날 졸음이 적어 안전하지만, 효과가 서서히 나타나며 개인차가 있을 수 있습니다.",
     effects: [
-      "수면 유도",
+      "수면 주기 조절",
       "불면증 완화",
-      "빠른 잠들기 효과",
-      "수면 시간 연장"
+      "수면의 질 향상",
+      "자연스러운 수면 유도"
     ],
     dosage: {
       method: "물과 함께 복용",
-      timing: "취침 30분 전",
-      frequency: "1회 1정, 1일 1회 (최대 1일 1정)"
+      timing: "취침 30분~1시간 전",
+      frequency: "1회 1-2정, 1일 1회 (최대 1일 3mg)"
     },
     sideEffects: [
-      "다음날 졸음 (잔여 효과)",
-      "기억력 저하 (드물게)",
-      "의존성 발생 가능",
-      "드물게 두통, 어지러움"
+      "드물게 다음날 졸음",
+      "드물게 두통",
+      "드물게 어지러움",
+      "드물게 구역질"
     ],
     precautions: [
-      "의사의 처방 없이 장기간 복용 금지",
-      "알코올과 절대 함께 복용 금지",
-      "연속 복용 시 2주 이내 권장",
-      "의존성이 생기기 쉬우므로 주의",
-      "운전 또는 위험한 작업 전 복용 금지"
+      "알코올과 함께 복용 시 효과 감소",
+      "임신 중 복용 전 의사 상담 필요",
+      "효과가 서서히 나타남 (1-2주)",
+      "규칙적인 수면 습관과 함께 복용 권장",
+      "운전 전 복용 시 주의"
     ],
-    ingredients: ["트리아졸람"],
+    ingredients: ["멜라토닌"],
     duration: "복용 후 30분~1시간에 효과 시작, 6-8시간 지속",
     ageRestrictions: {
-      infant: "유아기(0-2세) 절대 복용 금지",
-      child: "소아기(3-12세) 복용 금지. 의존성 위험 매우 높음",
-      elderly: "노년기(65세 이상)는 기억력 저하, 낙상 위험 증가로 용량 50% 감소 필수"
+      infant: "유아기(0-2세) 복용 금지. 의사 처방 필요",
+      child: "소아기(3-12세)는 용량 조절 필요, 의사 상담 권장",
+      elderly: "노년기(65세 이상)는 사용 가능하나 용량 조절 권장"
     },
     ageAlternatives: {
       infant: [], // 유아기에는 수면보조제 사용 금지
@@ -952,7 +951,7 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
   },
   "med_008": {
     id: "med_008",
-    name: "제산제게일정",
+    name: "마일론정",
     category: "제산제",
     characteristics: "위산 중화제로 속쓰림과 위산과다에 즉각적인 효과를 보이며, 가글 형태로 위장 벽을 보호합니다.",
     comparisonNote: "속쓰림에 즉각적이고 빠른 효과를 보입니다. 부작용이 거의 없고 맛도 부드러워 속 편하게 복용할 수 있지만, 변비 경향이 있는 분은 과다복용을 피해야 합니다.",
@@ -963,7 +962,7 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
       "소화 불량 완화"
     ],
     dosage: {
-      method: "씹어서 복용 또는 가글 후 삼킴",
+      method: "씹어서 복용 또는 물과 함께 복용",
       timing: "식후 1시간 또는 속쓰림 시",
       frequency: "1회 1정, 필요시 1일 최대 6정"
     },
@@ -992,7 +991,7 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
   },
   "med_009": {
     id: "med_009",
-    name: "불스피린정",
+    name: "이브정",
     category: "진통제/소염제",
     characteristics: "이부프로펜 성분의 소염진통제로 염증과 통증을 동시에 완화하며, 생리통과 복통에 효과적입니다.",
     comparisonNote: "염증과 통증에 강력한 효과를 보이며 생리통에 특히 좋습니다. 하지만 위장 장애 위험이 있어 식후 복용이 필수이며, 위장이 약한 분은 주의가 필요합니다.",
@@ -1034,9 +1033,9 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
   },
   "med_010": {
     id: "med_010",
-    name: "오라나민정",
+    name: "게보린정",
     category: "진통제/소염제",
-    characteristics: "아세트아미노펜과 이부프로펜 복합제로 치통과 같은 심한 통증에 효과적입니다.",
+    characteristics: "이부프로펜, 아세트아미노펜, 카페인 복합제로 치통과 같은 심한 통증에 효과적입니다.",
     comparisonNote: "치통과 같은 심한 통증에 강력하고 빠른 효과를 보입니다. 하지만 위장 장애 위험이 있어 식후 복용이 필수이며, 위장이 약한 분이나 임산부는 주의가 필요합니다.",
     effects: [
       "심한 통증 완화",
@@ -1061,7 +1060,7 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
       "상처가 심한 경우 즉시 치과 방문 권장",
       "알코올과 함께 복용 금지"
     ],
-    ingredients: ["아세트아미노펜", "이부프로펜"],
+    ingredients: ["이부프로펜", "아세트아미노펜", "카페인"],
     duration: "복용 후 20-30분에 효과 시작, 4-6시간 지속",
     ageRestrictions: {
       infant: "유아기(0-2세) 복용 금지. 이부프로펜 성분으로 인한 위장/신장 위험",
@@ -1116,7 +1115,7 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
   },
   "med_012": {
     id: "med_012",
-    name: "락트린정",
+    name: "로페마이드정",
     category: "소화제",
     characteristics: "설사 치료제로 장 운동을 조절하여 급성 설사를 빠르게 완화합니다.",
     comparisonNote: "급성 설사에 빠르고 확실한 효과를 보입니다. 부작용이 거의 없고 안전하게 복용할 수 있지만, 만성 설사나 혈변/점액변이 있는 경우에는 즉시 병원을 방문해야 합니다.",
@@ -1156,9 +1155,9 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
   },
   "med_013": {
     id: "med_013",
-    name: "나프록센정",
+    name: "이브정",
     category: "진통제/소염제",
-    characteristics: "나프록센 성분의 소염진통제로 생리통에 특효가 있으며, 자궁 수축으로 인한 통증을 완화합니다.",
+    characteristics: "이부프로펜 성분의 소염진통제로 생리통에 특효가 있으며, 자궁 수축으로 인한 통증을 완화합니다.",
     comparisonNote: "생리통에 특히 효과적이며, 생리 시작 전 미리 복용하면 더욱 효과적입니다. 효과 지속 시간이 길어(6-8시간) 편리하지만, 위장 장애 위험이 있어 식후 복용이 필수입니다.",
     effects: [
       "생리통 완화",
@@ -1183,7 +1182,7 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
       "위궤양 환자는 복용 금지",
       "임신 중 복용 전 의사 상담 필요"
     ],
-    ingredients: ["나프록센"],
+    ingredients: ["이부프로펜"],
     duration: "복용 후 30분~1시간에 효과 시작, 6-8시간 지속",
     ageRestrictions: {
       infant: "유아기(0-2세) 복용 금지. 위장 자극 및 신장 위험",
@@ -1237,7 +1236,7 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
   },
   "med_015": {
     id: "med_015",
-    name: "락투로즈정",
+    name: "락툴로스정",
     category: "변비제",
     characteristics: "장내 수분 증가제로 변을 부드럽게 만들어 배변을 용이하게 하며, 안전한 변비 치료제입니다.",
     comparisonNote: "변비에 안전하고 효과적인 약으로 부작용이 거의 없습니다. 하지만 효과가 나타나기까지 24-48시간이 걸리므로, 급하게 해결하고 싶은 경우에는 다른 약을 고려해볼 수 있습니다.",
@@ -1278,7 +1277,7 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
   },
   "med_016": {
     id: "med_016",
-    name: "베타히스틴정",
+    name: "베타힐정",
     category: "어지럼증 치료제",
     characteristics: "내이 순환 개선제로 어지러움과 멀미를 완화하며, 균형 감각을 개선합니다.",
     comparisonNote: "어지러움과 멀미에 효과적이며 부작용이 거의 없습니다. 하지만 운동 전 복용 시 주의가 필요하며, 기존 어지럼증 질환이 있는 경우 의사 상담이 필요합니다.",
@@ -1318,9 +1317,9 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
   },
   "med_017": {
     id: "med_017",
-    name: "자로스정",
+    name: "히드록시진정",
     category: "진정제",
-    characteristics: "진정 작용제로 불안, 스트레스, 긴장을 완화하며, 가벼운 진정 효과가 있습니다.",
+    characteristics: "히드록시진 성분의 진정 작용제로 불안, 스트레스, 긴장을 완화하며, 가벼운 진정 효과가 있습니다.",
     comparisonNote: "불안과 스트레스에 효과적이지만 졸음이 오므로 운전 전 복용은 절대 금지입니다. 필요시 복용이 가능하여 간편하지만, 장기간 복용 시 의사 상담이 필요합니다.",
     effects: [
       "불안 완화",
@@ -1359,7 +1358,7 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
   },
   "med_019": {
     id: "med_019",
-    name: "우리나스프레이",
+    name: "클로르헥시딘구강액",
     category: "구강약",
     characteristics: "구강 소독제로 구내염과 입 안 상처에 직접 도포하여 염증을 완화하고 회복을 촉진합니다.",
     comparisonNote: "구내염에 직접 도포하여 빠르고 확실한 효과를 보입니다. 부작용이 거의 없고 편리하게 사용할 수 있지만, 삼키면 안 되므로 어린이 사용 시 주의가 필요합니다.",
@@ -1400,7 +1399,7 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
   // 20. 안과 약물 (서울대 보건진료소 진료과 기반)
   "med_020": {
     id: "med_020",
-    name: "아이리프 인공눈물",
+    name: "하이알루 인공눈물",
     category: "안약",
     characteristics: "히알루론산 성분의 인공눈물로 안구건조증과 눈 피로에 효과적이며, 자연스러운 눈물과 유사한 성분입니다.",
     comparisonNote: "눈 건조증과 피로에 즉각적이고 부드러운 효과를 보입니다. 부작용이 거의 없고 콘택트렌즈 착용 중에도 사용 가능하지만, 하루에 여러 번 점안해야 할 수 있습니다.",
@@ -1482,7 +1481,7 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
   // 22-23. 피부과 약물 (서울대 보건진료소 진료과 기반)
   "med_022": {
     id: "med_022",
-    name: "벤조일퍼옥사이드 연고",
+    name: "벤자케이연고",
     category: "여드름 치료제",
     characteristics: "여드름 치료에 효과적인 항균 및 각질 제거제로 염증성 여드름과 비염증성 여드름 모두에 효과적입니다.",
     comparisonNote: "여드름에 강력하고 확실한 효과를 보입니다. 하지만 초기 사용 시 피부 자극(건조, 벗겨짐)이 발생할 수 있으며, 햇빛에 민감해질 수 있어 주의가 필요합니다.",
@@ -1523,9 +1522,9 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
   },
   "med_023": {
     id: "med_023",
-    name: "레티노이드 크림",
+    name: "레티놀크림",
     category: "여드름 치료제",
-    characteristics: "비타민 A 유도체로 여드름과 주름 개선에 효과적이며, 피부 재생을 촉진합니다.",
+    characteristics: "레티놀 성분의 여드름 치료제로 여드름과 피부 재생에 효과적입니다. 처방전 필요할 수 있으므로 의사 상담 권장.",
     comparisonNote: "여드름과 피부 재생에 강력한 효과를 보입니다. 하지만 초기 사용 시 피부 자극이 심하고, 햇빛에 매우 민감하며, 임신 중 사용 금지이므로 주의가 필요합니다.",
     effects: [
       "여드름 치료",
@@ -1565,7 +1564,7 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
   // 24-25. 습진 치료제
   "med_024": {
     id: "med_024",
-    name: "하이드로코르티손 연고",
+    name: "하이드로코르티손크림",
     category: "스테로이드 연고",
     characteristics: "가벼운 스테로이드 연고로 습진과 피부 염증에 효과적이며, 가려움과 발진을 완화합니다.",
     comparisonNote: "습진과 가려움에 빠르고 확실한 효과를 보입니다. 하지만 장기간 사용 시 피부 위축 위험이 있고, 얼굴에는 장기간 사용을 피해야 합니다.",

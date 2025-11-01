@@ -126,7 +126,7 @@ export default function ChatPage() {
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && router.push("/")}
               >
-                <Image src="/assets/pill.png" alt="pill" width={28} height={28} />
+                <span className="text-2xl">💊</span>
                 <div className="font-semibold ml-3">약장수 챗봇
                   <span className="ml-2 text-xs text-green-400">● Active</span>
                 </div>
@@ -160,8 +160,8 @@ export default function ChatPage() {
               {messages.map((m) => (
                 <div key={m.id} className={m.role === "user" ? "flex justify-end" : "flex items-start"}>
                   {m.role === "assistant" && (
-                    <div className="mr-3">
-                      <Image src="/assets/robot-pharmacist.png" alt="robot pharmacist" width={40} height={40} className="rounded-md" />
+                    <div className="mr-3 flex items-center justify-center w-10 h-10 text-3xl">
+                      💊
                     </div>
                   )}
                   <div
