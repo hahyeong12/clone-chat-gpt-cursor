@@ -3,6 +3,7 @@
 import { medications } from "./medications";
 import type { Medication } from "./medications";
 import type { UserProfile } from "./user-profile";
+import { medicationDetails } from "./symptom-categories";
 
 export interface ChatMessage {
   role: "user" | "assistant";
@@ -17,13 +18,13 @@ export async function* generateMedicationResponse(
   
   // 인사말 처리
   if (lowerMessage.includes("안녕") || lowerMessage.includes("hello") || lowerMessage.includes("hi")) {
-    yield* generateStream("안녕하세요! 약장수 챗봇입니다. 어떤 증상으로 불편하신가요?");
+    yield* generateStream("어서오십쇼! 약장숩니다. 어디가 불편하셔?");
     return;
   }
   
   // 로그인 관련
   if (lowerMessage.includes("로그인") || lowerMessage.includes("로그아웃")) {
-    yield* generateStream("로그인은 상단의 로그인 버튼을 클릭해주세요.");
+    yield* generateStream("로그인은 위에 있는 로그인 버튼 누르시면 됩니다!");
     return;
   }
   
@@ -51,9 +52,9 @@ export async function* generateMedicationResponse(
       "냉찜질로 눈 피로 완화",
       "콘택트렌즈 일시 중단"
     ];
-    let msg = "눈 통증/불편감에 대한 안내입니다.\n\n";
-    msg += "권장 조치:\n- " + tips.join("\n- ") + "\n\n";
-    msg += "다음 증상 중 하나라도 있으면 즉시 안과 방문 권장:\n- " + redFlags.join("\n- ");
+    let msg = "아, 눈이 아프시구나! 형님, 이거 좀 들어보세요.\n\n";
+    msg += "일단 이렇게 해보시면 좀 낫습니다:\n- " + tips.join("\n- ") + "\n\n";
+    msg += "근데 다음 증상 중 하나라도 있으면 바로 안과 가셔야 해요:\n- " + redFlags.join("\n- ");
     yield* generateStream(msg);
     return;
   }
@@ -70,29 +71,29 @@ export async function* generateMedicationResponse(
     if (userMessage.includes("?") || userMessage.includes("뭐") || userMessage.includes("무엇") || 
         userMessage.includes("어떤") || userMessage.includes("어떻게") || userMessage.includes("언제") ||
         userMessage.includes("왜") || userMessage.includes("어디")) {
-      yield* generateStream("안녕하세요! 약장수 챗봇입니다.\n\n저는 증상에 맞는 약을 추천해드리는 챗봇입니다. 예를 들어:\n\n• '머리가 아파요' → 두통 약 추천\n• '소화가 안 돼요' → 소화제 추천\n• '기침이 나요' → 기침약 추천\n\n어떤 증상으로 불편하신지 알려주시면 적합한 약을 추천해드리겠습니다! 😊");
+      yield* generateStream("형님! 약장숩니다.\n\n저는 증상에 맞는 약 추천해드리는 거예요. 예를 들면:\n\n• '머리가 아파요' → 두통 약 추천\n• '소화가 안 돼요' → 소화제 추천\n• '기침이 나요' → 기침약 추천\n\n어디가 불편하신지 말씀해주시면 제가 좋은 거 골라드릴게요! 😊");
       return;
     }
     
     // 일반적인 감사나 긍정적 표현
     if (userMessage.includes("감사") || userMessage.includes("고마") || userMessage.includes("좋") || 
         userMessage.includes("도움") || userMessage.includes("고맙")) {
-      yield* generateStream("천만에요! 언제든지 불편한 증상이 있으면 말씀해주세요.\n\n건강하세요! 💚");
+      yield* generateStream("고맙다고 하지 마세요! 형님 건강하시는 게 제일 중요한 거라니까요.\n\n또 불편하시면 언제든 말씀해주세요! 💚");
       return;
     }
     
     // 부정적인 표현 (그만, 싫어 등)
     if (userMessage.includes("그만") || userMessage.includes("안") || userMessage.includes("싫")) {
-      yield* generateStream("알겠습니다. 필요하실 때 언제든지 말씀해주세요!");
+      yield* generateStream("알겠습니다! 또 필요하시면 언제든 말씀해주세요.");
       return;
     }
     
     // 일반적인 인사나 대화
     const casualResponses = [
-      "안녕하세요! 약장수 챗봇입니다. 어떤 증상으로 불편하신가요?",
-      "네, 말씀해주세요! 증상을 알려주시면 적합한 약을 추천해드리겠습니다.",
-      "무엇을 도와드릴까요? 증상을 설명해주시면 약을 추천해드릴 수 있습니다.",
-      "어떤 증상이 있으신가요? 예를 들어 '머리가 아파요', '소화가 안 돼요' 같은 식으로 설명해주시면 도움을 드릴 수 있습니다."
+      "어서오십쇼! 약장숩니다. 어디가 불편하셔?",
+      "네, 말씀해주세요! 어디가 아프신지 알려주시면 좋은 약 골라드릴게요.",
+      "뭐가 불편하신가요? 증상 말씀해주시면 제가 추천해드릴게요.",
+      "어디가 아프신지 말씀해주세요! 예를 들어 '머리가 아파요', '소화가 안 돼요' 같은 식으로요."
     ];
     
     yield* generateStream(casualResponses[Math.floor(Math.random() * casualResponses.length)]);
@@ -100,39 +101,85 @@ export async function* generateMedicationResponse(
   }
   
   // 증상 확인 및 상황 분석
-  responses.push(`증상을 확인했습니다: ${symptoms.join(", ")}`);
+  responses.push(`아하, ${symptoms.join(", ")} 때문에 불편하시는구나!`);
   
   // 상황별 안내 추가
   const situation = analyzeSituation(userMessage);
   if (situation) {
-    responses.push(`\n상황 분석: ${situation}`);
+    responses.push(`\n상황 보니 ${situation}인 거 같네요.`);
   }
   
   // 약 추천
   const recommendations = recommendMedication(symptoms, userProfile);
   
   if (recommendations.length === 0) {
-    responses.push(`\n해당 증상에 적합한 약을 찾지 못했습니다.`);
-    responses.push(`\n💡 더 자세한 증상을 알려주시거나 병원을 방문하는 것을 권장합니다.`);
+    responses.push(`\n아, 이 증상에는 제가 가진 약이 딱 맞는 게 없네요.`);
+    responses.push(`\n💡 좀 더 자세히 말씀해주시거나 병원 가보시는 게 좋을 것 같아요.`);
   } else {
     responses.push(`\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-    responses.push(`\n📋 추천 약물 (${recommendations.length}개)`);
+    responses.push(`\n📋 제가 골라본 약들 (${recommendations.length}개)`);
     responses.push(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
     
+    // 사용자 연령 확인
+    const userAge = userProfile?.age;
+    const isInfant = userAge !== undefined && userAge >= 0 && userAge <= 2;
+    const isElderly = userAge !== undefined && userAge >= 65;
+    
     recommendations.forEach((med, idx) => {
-      responses.push(`\n\n${idx + 1}. ${med.name}`);
+      // 약 상세 정보 가져오기
+      const medDetail = medicationDetails[med.id];
+      
+      // 약장수 말투로 약 소개
+      const introPhrases = [
+        `형님, 이거 한 번 잡솨보세요. ${med.name}인데 정말 좋아요!`,
+        `이 ${med.name} 한 번 보세요. 이거 어디어디에서 이미 정평이 난 거예요!`,
+        `${med.name} 한 번 추천해드릴게요. 이거 정말 효과 좋습니다!`,
+        `이거 어떠세요? ${med.name}인데, 정말 좋은 약이에요!`
+      ];
+      responses.push(`\n\n${idx + 1}. ${introPhrases[idx % introPhrases.length]}`);
       responses.push(`   [ ${med.category} ]`);
       
-      responses.push(`\n   📌 치료 증상`);
+      responses.push(`\n   📌 이 약으로 낫는 증상`);
       responses.push(`   ${med.symptoms.join(", ")}`);
       
-      responses.push(`\n   💊 용법`);
+      responses.push(`\n   💊 이렇게 드시면 됩니다`);
       responses.push(`   ${med.dosage}`);
+      
+      // 연령별 안내 추가
+      if (medDetail) {
+        if (isInfant && medDetail.ageRestrictions?.infant) {
+          responses.push(`\n   👶 유아기(0-2세) 이용자 안내`);
+          responses.push(`   ${medDetail.ageRestrictions.infant}`);
+          
+          // 대체 약 추천
+          if (medDetail.ageAlternatives?.infant && medDetail.ageAlternatives.infant.length > 0) {
+            const altMeds = medDetail.ageAlternatives.infant
+              .map(altId => medicationDetails[altId]?.name)
+              .filter(Boolean);
+            if (altMeds.length > 0 && altMeds[0] !== med.name) {
+              responses.push(`   💡 유아기에는 ${altMeds.join(" 또는 ")}이(가) 더 안전할 수 있어요.`);
+            }
+          }
+        } else if (isElderly && medDetail.ageRestrictions?.elderly) {
+          responses.push(`\n   👴 노년기(65세 이상) 이용자 안내`);
+          responses.push(`   ${medDetail.ageRestrictions.elderly}`);
+          
+          // 대체 약 추천
+          if (medDetail.ageAlternatives?.elderly && medDetail.ageAlternatives.elderly.length > 0) {
+            const altMeds = medDetail.ageAlternatives.elderly
+              .map(altId => medicationDetails[altId]?.name)
+              .filter(Boolean);
+            if (altMeds.length > 0 && altMeds[0] !== med.name) {
+              responses.push(`   💡 노년기에는 ${altMeds.join(" 또는 ")}이(가) 더 안전할 수 있어요.`);
+            }
+          }
+        }
+      }
       
       // 상황별 맞춤 복용 시간 추천
       const customDosage = getCustomDosageAdvice(med, userMessage, userProfile);
       if (customDosage) {
-        responses.push(`\n   ⏰ 상황별 추천`);
+        responses.push(`\n   ⏰ 상황에 맞게 이렇게 드시면 좋아요`);
         // 긴 경우 여러 줄로 나누기
         if (customDosage.length > 40) {
           const parts = customDosage.split(" | ");
@@ -145,14 +192,14 @@ export async function* generateMedicationResponse(
       }
       
       if (med.warnings && med.warnings.length > 0) {
-        responses.push(`\n   ⚠️ 주의사항`);
+        responses.push(`\n   ⚠️ 이건 좀 주의하셔야 해요`);
         med.warnings.forEach(warning => {
           responses.push(`   ${warning}`);
         });
       }
       
       if (med.caution && userProfile) {
-        responses.push(`\n   🔔 맞춤 주의`);
+        responses.push(`\n   🔔 형님 상황에는 이렇게`);
         responses.push(`   ${med.caution}`);
       }
       
@@ -162,13 +209,26 @@ export async function* generateMedicationResponse(
       }
     });
     
+    // 연령별 종합 추천 메시지
+    if (userAge !== undefined) {
+      if (isInfant) {
+        responses.push(`\n\n👶 유아기 이용자 추가 안내`);
+        responses.push(`   유아기(0-2세)는 체중에 따라 용량 조절이 필수입니다.`);
+        responses.push(`   모든 약 복용 전에 반드시 소아과 의사나 약사와 상담하세요.`);
+      } else if (isElderly) {
+        responses.push(`\n\n👴 노년기 이용자 추가 안내`);
+        responses.push(`   노년기(65세 이상)는 신장/간 기능 저하 가능성으로 용량 조절이 필요합니다.`);
+        responses.push(`   특히 졸음 부작용이 있는 약은 낙상 위험이 높으니 주의하세요.`);
+      }
+    }
+    
     responses.push(`\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-    responses.push(`\n📝 참고사항\n`);
-    responses.push(`   위 내용은 참고용이며, 복용 전 의사나 약사와 상담하시기 바랍니다.`);
+    responses.push(`\n📝 한 가지 말씀드릴게요\n`);
+    responses.push(`   위 내용은 참고용이에요. 복용 전에 의사나 약사분께 한 번 물어보시는 게 좋습니다.`);
     
     // 긴급 상황 안내
     if (symptoms.some(s => s.includes("근육") || s.includes("가슴"))) {
-      responses.push(`\n   🚨 응급 증상 시 즉시 병원을 방문하세요.`);
+      responses.push(`\n   🚨 응급 증상이면 즉시 병원 가세요!`);
     }
   }
   
@@ -178,15 +238,15 @@ export async function* generateMedicationResponse(
     const personalizedRecommendation = getPersonalizedRecommendation(recommendations, userProfile);
     
     if (personalizedRecommendation) {
-      responses.push(`\n${userProfile.username}님의 체질(${bodyType})을 고려한 맞춤 추천:`);
-      responses.push(`→ ${personalizedRecommendation.name}이(가) 가장 적합해 보입니다.`);
+      responses.push(`\n${userProfile.username}님 체질(${bodyType}) 보니까`);
+      responses.push(`→ ${personalizedRecommendation.name}이(가) 제일 잘 맞을 것 같아요!`);
     }
   }
   
   yield* generateStream(responses.join(""));
 }
 
-function extractSymptoms(text: string): string[] {
+export function extractSymptoms(text: string): string[] {
   const found: string[] = [];
   const lowerText = text.toLowerCase().replace(/\s+/g, "");
   
