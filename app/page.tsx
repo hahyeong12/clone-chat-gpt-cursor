@@ -1,221 +1,305 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { sendChat, type ClientMessage } from "@/lib/stream";
-import { LoginDialog } from "@/components/login-dialog";
-import { initializeTestUsers, type UserProfile, getOrCreateGoogleUser, getUserProfile } from "@/lib/user-profile";
-import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
-import { useChat } from "@/lib/chat-context";
-import { SpinningPill } from "@/components/ui/spinning-pill";
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { formatAssistantResponse } from "@/lib/utils";
 
-export default function Home() {
-  const { messages, setMessages } = useChat(); // 전역 상태 사용
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
-  const viewportRef = useRef<HTMLDivElement>(null); // viewportRef 추가
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { symptomCategories, medicationDetails } from "@/lib/symptom-categories";
+import { useSession, signOut } from "next-auth/react";
+import { LoginDialog } from "@/components/login-dialog";
+import { Button } from "@/components/ui/button";
+
+export default function HomePage() {
+  const router = useRouter();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedDetailedSymptom, setSelectedDetailedSymptom] = useState<string | null>(null);
   const { data: session, status } = useSession();
 
-  useEffect(() => {
-    initializeTestUsers();
-  }, []);
+  const currentCategory = selectedCategory 
+    ? symptomCategories.find(cat => cat.id === selectedCategory)
+    : null;
 
-  // NextAuth 세션 변경 시 사용자 프로필 로드
-  useEffect(() => {
-    if (status === "authenticated" && session?.user) {
-      const userId = session.user.id || session.user.email || "";
-      const email = session.user.email || "";
-      const name = session.user.name || "사용자";
-      
-      if (userId) {
-        // Google 로그인 사용자 프로필 가져오기 또는 생성
-        const userProfile = getOrCreateGoogleUser(userId, email, name);
-        setCurrentUser(userProfile);
-        
-        // 환영 메시지 설정 (메시지가 없을 때만)
-        if (messages.length === 0) {
-          setMessages([{
-            id: crypto.randomUUID(),
-            role: "assistant",
-            content: `안녕하세요, ${userProfile.username}님! 약장수입니다. 어떤 증상으로 불편하신가요?`
-          }]);
-        }
-      }
-    } else if (status === "unauthenticated") {
-      // 로그아웃 상태면 사용자 정보 초기화
-      if (currentUser) {
-        setCurrentUser(null);
-        // 로그아웃 시 메시지 초기화 (선택적)
-        // setMessages([]); 
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session, status]);
+  const currentDetailedSymptom = selectedDetailedSymptom && currentCategory
+    ? currentCategory.detailedSymptoms.find(s => s.id === selectedDetailedSymptom)
+    : null;
 
-  useEffect(() => {
-    viewportRef.current?.scrollTo({ top: viewportRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages]);
-
-  async function onSend() {
-    const content = input.trim();
-    if (!content || loading) return;
-    setInput("");
-    const userMsg = { id: crypto.randomUUID(), role: "user" as const, content };
-    const asstMsg = { id: crypto.randomUUID(), role: "assistant" as const, content: "" };
-    setMessages((prev) => [...prev, userMsg, asstMsg]);
-    setLoading(true);
-    try {
-      const stream = await sendChat({
-        messages: [...messages, userMsg].map(({ role, content }) => ({ role, content })),
-        temperature: 0.7,
-        max_tokens: 512,
-        userId: currentUser?.userId,
-        token: session?.idToken, // 세션의 idToken 전달
-      });
-      for await (const token of stream) {
-        setMessages((prev) => prev.map((m) => (m.id === asstMsg.id ? { ...m, content: m.content + token } : m)));
-      }
-    } catch (e: any) {
-      setMessages((prev) => prev.map((m) => (m.id === asstMsg.id ? { ...m, content: `[오류] ${e.message}` } : m)));
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const handleLogin = (user: UserProfile) => {
-    setCurrentUser(user);
-    setMessages([{
-      id: crypto.randomUUID(),
-      role: "assistant",
-      content: `안녕하세요, ${user.username}님! 약장수 챗봇입니다. 어떤 증상으로 불편하신가요?`
-    }]);
+  const handleCategorySelect = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+    setSelectedDetailedSymptom(null);
   };
 
-  const handleLogout = async () => {
-    // NextAuth 세션이 있으면 NextAuth 로그아웃, 없으면 로컬 로그아웃
-    if (session) {
-      await nextAuthSignOut({ callbackUrl: "/" });
-    }
-    setCurrentUser(null);
-    setMessages([]);
+  const handleDetailedSymptomSelect = (symptomId: string) => {
+    setSelectedDetailedSymptom(symptomId);
   };
 
-  function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      onSend();
-    }
-  }
+  const handleBackToCategories = () => {
+    setSelectedCategory(null);
+    setSelectedDetailedSymptom(null);
+  };
+
+  const handleBackToDetailed = () => {
+    setSelectedDetailedSymptom(null);
+  };
+
+  // 약장수 버튼 클릭 시 초기 상태로 리셋
+  const handleResetToHome = () => {
+    setSelectedCategory(null);
+    setSelectedDetailedSymptom(null);
+  };
 
   return (
-    <div className="h-screen flex flex-col items-center px-4 py-6 gap-4 bg-gradient-to-b from-[#ede9fe] to-white text-foreground">
-      {/* 헤더에 사이트 이동 버튼 추가 */}
-      <Link href="/home" className="absolute top-4 right-4">
-        <button className="bg-white text-[#7c3aed] px-4 py-2 rounded-lg border border-[#e5e7eb] hover:bg-gray-50 transition-colors">
-          📋 의약품 검색
-        </button>
-      </Link>
-
-      <main className="w-full max-w-2xl flex-1 flex flex-col border border-[#e5e7eb] rounded-2xl p-4 bg-white shadow-sm min-h-0">
-        <header className="flex items-center justify-between pb-3 border-b border-[#2a2a3d] mb-3">
-          <div className="flex flex-col">
-            <div className="flex items-center">
-              <div className="font-semibold">💊 약장수
-                <span className="ml-2 text-xs text-green-400">● Active</span>
-              </div>
-            </div>
-            {currentUser && (
-              <div className="text-xs text-gray-500 mt-1">
-                {currentUser.username}님 (체질: {currentUser.bodyType || "평상형"})
-              </div>
-            )}
+    <div className="min-h-screen bg-gradient-to-b from-[#ede9fe] to-white">
+      {/* 헤더 */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h1 
+              onClick={handleResetToHome}
+              className="text-2xl font-bold text-[#7c3aed] hover:text-[#6d28d9] transition-colors cursor-pointer"
+            >
+              약장수
+            </h1>
+            <span className="text-sm text-gray-500">의약품 정보 검색</span>
           </div>
-          <div className="flex gap-2">
-            {currentUser ? (
+          <div className="flex items-center gap-3">
+            {status === "authenticated" && session?.user ? (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-600">
+                  {session.user.name || session.user.email}님
+                </span>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleLogout}
+                  onClick={() => signOut({ callbackUrl: "/" })}
                 className="text-xs"
               >
                 로그아웃
               </Button>
+              </div>
             ) : (
-              <LoginDialog onLogin={handleLogin} />
+              <LoginDialog />
             )}
+            <Link href="/chat">
+              <button className="bg-[#7c3aed] text-white px-6 py-2 rounded-lg hover:bg-[#6d28d9] transition-colors">
+                AI 챗봇 상담
+              </button>
+            </Link>
+          </div>
           </div>
         </header>
 
-        <ScrollArea className="flex-1 min-h-0" viewportRef={viewportRef}>
-          <div className="pr-2">
-            <div className="space-y-3">
-              {messages.map((m) => (
-                <div key={m.id} className={m.role === "user" ? "flex justify-end" : "flex items-start"}>
-                  {m.role === "assistant" && (
-                    <div className="mr-3 text-2xl">
-                      🤖
+      {/* 메인 콘텐츠 */}
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        {/* 증상별 카테고리 목록 */}
+        {!selectedCategory && (
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">증상별 약 추천</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {symptomCategories.map(category => (
+                <button
+                  key={category.id}
+                  onClick={() => handleCategorySelect(category.id)}
+                  className="bg-white rounded-xl border-2 border-gray-200 p-6 hover:border-[#7c3aed] hover:shadow-lg transition-all text-center"
+                >
+                  <div className="text-4xl mb-3">{category.icon}</div>
+                  <div className="font-semibold text-gray-800">{category.title}</div>
+                </button>
+              ))}
+            </div>
                     </div>
+        )}
+
+        {/* 세부 증상 선택 */}
+        {selectedCategory && currentCategory && !selectedDetailedSymptom && (
+          <div>
+            <button
+              onClick={handleBackToCategories}
+              className="mb-4 text-[#7c3aed] hover:text-[#6d28d9] flex items-center gap-2"
+            >
+              ← 뒤로가기
+            </button>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">{currentCategory.title}</h2>
+            <p className="text-gray-600 mb-6">어디가 어떻게 아플 때를 선택해주세요</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {currentCategory.detailedSymptoms.map(symptom => (
+                <button
+                  key={symptom.id}
+                  onClick={() => handleDetailedSymptomSelect(symptom.id)}
+                  className="bg-white rounded-xl border-2 border-gray-200 p-6 hover:border-[#7c3aed] hover:shadow-lg transition-all text-left"
+                >
+                  <div className="font-semibold text-lg text-gray-800 mb-2">{symptom.title}</div>
+                  {symptom.description && (
+                    <div className="text-sm text-gray-600">{symptom.description}</div>
                   )}
-                  <div
-                    className={
-                      "markdown-content inline-block rounded-2xl px-4 py-3 max-w-[85%] whitespace-pre-wrap break-words " +
-                      (m.role === "user"
-                        ? "bg-[#7c3aed] text-white shadow-[0_8px_24px_-8px_rgba(124,58,237,0.4)]"
-                        : "bg-[#f3f4f6] text-[#111827] border border-[#e5e7eb]")
-                    }
-                  >
-                    {m.role === "user" && m.content}
-                    {m.role === "assistant" && m.content ? (
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {formatAssistantResponse(m.content)}
-                      </ReactMarkdown>
-                    ) : null}
-                    {m.role === "assistant" && !m.content && loading && (
-                      <SpinningPill />
-                    )}
-                  </div>
-                  {m.role === "user" && <div className="w-10" />}
-                </div>
+                </button>
               ))}
             </div>
           </div>
-        </ScrollArea>
+        )}
 
-        <form 
-          onSubmit={(e) => {
-            e.preventDefault();
-            onSend();
-          }}
-          className="mt-4 flex items-end gap-2 bg-white border border-[#e5e7eb] rounded-xl p-2"
-        >
-          <Textarea
-            id="chat-input"
-            name="chat-input"
-            className="flex-1 h-16 bg-white text-[#111827] border-none focus-visible:ring-0 placeholder:text-[#9ca3af]"
-            placeholder={currentUser ? "증상을 알려주세요 (예: 두통, 소화불량, 기침)" : "로그인 후 증상을 입력하세요"}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={onKeyDown}
-            disabled={!currentUser}
-            autoComplete="off"
-          />
-          <Button 
-            type="submit"
-            name="send-button"
-            id="send-button"
-            disabled={loading || !input.trim()} 
-            className="bg-[#7c3aed] hover:bg-[#6d28d9] text-white"
-          >
-            보내기
-          </Button>
-        </form>
+        {/* 약 상세 정보 */}
+        {selectedDetailedSymptom && currentDetailedSymptom && (
+          <div>
+            <button
+              onClick={handleBackToDetailed}
+              className="mb-4 text-[#7c3aed] hover:text-[#6d28d9] flex items-center gap-2"
+            >
+              ← 뒤로가기
+            </button>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">{currentDetailedSymptom.title}</h2>
+            {currentDetailedSymptom.description && (
+              <p className="text-gray-600 mb-6">{currentDetailedSymptom.description}</p>
+            )}
+
+            {/* 약 개수에 따라 레이아웃 조정 */}
+            <div 
+              className={
+                currentDetailedSymptom.medications.length === 2
+                  ? "grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto"
+                  : currentDetailedSymptom.medications.length === 3
+                  ? "grid grid-cols-1 md:grid-cols-3 gap-6"
+                  : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+              }
+            >
+              {currentDetailedSymptom.medications.map((medId, index) => {
+                const medDetail = medicationDetails[medId];
+                if (!medDetail) return null;
+
+                return (
+                  <div
+                    key={medId}
+                    className={`bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-lg transition-shadow flex flex-col ${
+                      currentDetailedSymptom.medications.length === 2 
+                        ? "h-full p-6" 
+                        : "p-5"
+                    }`}
+                  >
+                    {/* 헤더 */}
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-lg font-bold text-gray-800">{medDetail.name}</h3>
+                        <span className="text-xs text-[#7c3aed] bg-purple-50 px-2 py-1 rounded-full">
+                          {medDetail.category}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-600 mb-3">{medDetail.characteristics}</p>
+                      
+                      {/* 비교 설명 */}
+                      {medDetail.comparisonNote && (
+                        <div className="bg-blue-50 border-l-4 border-blue-400 p-3 rounded-r-lg mb-3">
+                          <div className="text-xs font-semibold text-blue-800 mb-1">💡 이 약을 선택하면 좋은 경우</div>
+                          <p className="text-xs text-blue-700 leading-relaxed">{medDetail.comparisonNote}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 효과 */}
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-1">
+                        <span>✨</span> 효과
+                      </h4>
+                      <ul className="space-y-1">
+                        {medDetail.effects.slice(0, 3).map((effect, idx) => (
+                          <li key={idx} className="flex items-start gap-1 text-xs text-gray-700">
+                            <span className="text-[#7c3aed] mt-0.5">•</span>
+                            <span className="line-clamp-1">{effect}</span>
+                          </li>
+                        ))}
+                        {medDetail.effects.length > 3 && (
+                          <li className="text-xs text-gray-500">+ {medDetail.effects.length - 3}개 더</li>
+                        )}
+                      </ul>
+                    </div>
+
+                    {/* 복용법 */}
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-1">
+                        <span>💊</span> 복용법
+                      </h4>
+                      <div className="bg-gray-50 rounded-lg p-2 space-y-1 text-xs">
+                        <div className="flex items-start gap-1">
+                          <span className="font-medium text-gray-600 min-w-[50px]">시간:</span>
+                          <span className="text-gray-700">{medDetail.dosage.timing}</span>
+                        </div>
+                        <div className="flex items-start gap-1">
+                          <span className="font-medium text-gray-600 min-w-[50px]">횟수:</span>
+                          <span className="text-gray-700">{medDetail.dosage.frequency}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 성분 */}
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-1">
+                        <span>🧪</span> 성분
+                      </h4>
+                      <div className="flex flex-wrap gap-1">
+                        {medDetail.ingredients.slice(0, 2).map((ingredient, idx) => (
+                          <span
+                            key={idx}
+                            className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full text-xs"
+                          >
+                            {ingredient}
+                          </span>
+                        ))}
+                        {medDetail.ingredients.length > 2 && (
+                          <span className="text-xs text-gray-500 px-2 py-0.5">
+                            +{medDetail.ingredients.length - 2}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 부작용 */}
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-orange-700 mb-2 flex items-center gap-1">
+                        <span>⚠️</span> 부작용
+                      </h4>
+                      <ul className="space-y-1">
+                        {medDetail.sideEffects.slice(0, 2).map((sideEffect, idx) => (
+                          <li key={idx} className="flex items-start gap-1 text-xs text-gray-700">
+                            <span className="text-orange-500 mt-0.5">•</span>
+                            <span className="line-clamp-1">{sideEffect}</span>
+                          </li>
+                        ))}
+                        {medDetail.sideEffects.length > 2 && (
+                          <li className="text-xs text-gray-500">+ {medDetail.sideEffects.length - 2}개 더</li>
+                        )}
+                      </ul>
+                    </div>
+
+                    {/* 주의사항 */}
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-red-700 mb-2 flex items-center gap-1">
+                        <span>🔔</span> 주의사항
+                      </h4>
+                      <ul className="space-y-1">
+                        {medDetail.precautions.slice(0, 2).map((precaution, idx) => (
+                          <li key={idx} className="flex items-start gap-1 text-xs text-gray-700">
+                            <span className="text-red-500 mt-0.5">•</span>
+                            <span className="line-clamp-2">{precaution}</span>
+                          </li>
+                        ))}
+                        {medDetail.precautions.length > 2 && (
+                          <li className="text-xs text-gray-500">+ {medDetail.precautions.length - 2}개 더</li>
+                        )}
+                      </ul>
+                    </div>
+
+                    {/* 효과 지속 시간 */}
+                    {medDetail.duration && (
+                      <div className="pt-3 border-t border-gray-100 mt-auto">
+                        <div className="text-xs text-gray-600">
+                          <span className="font-medium">효과 지속: </span>
+                          {medDetail.duration}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

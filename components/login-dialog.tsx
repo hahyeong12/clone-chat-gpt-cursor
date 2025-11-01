@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -11,55 +10,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { authenticateUser, type UserProfile, getOrCreateGoogleUser } from "@/lib/user-profile";
 import { signIn } from "next-auth/react";
 
-interface LoginDialogProps {
-  onLogin: (user: UserProfile) => void;
-}
-
-export function LoginDialog({ onLogin }: LoginDialogProps) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+export function LoginDialog() {
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    // 컴포넌트 마운트 시 테스트 계정 초기화
-    const { initializeTestUsers } = require("@/lib/user-profile");
-    initializeTestUsers();
-  }, []);
-
-  const handleLogin = (e?: React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
-    setError("");
-    
-    if (!username || !password) {
-      setError("아이디와 비밀번호를 입력해주세요.");
-      return;
-    }
-
-    const user = authenticateUser(username, password);
-    
-    if (user) {
-      onLogin(user);
-      setUsername("");
-      setPassword("");
-      setError("");
-    } else {
-      setError("아이디 또는 비밀번호가 올바르지 않습니다.");
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleLogin();
-    }
-  };
 
   const handleGoogleLogin = async () => {
     try {
+      setError("");
       await signIn("google", { callbackUrl: "/" });
     } catch (error) {
       setError("Google 로그인 중 오류가 발생했습니다.");
@@ -74,15 +32,15 @@ export function LoginDialog({ onLogin }: LoginDialogProps) {
           로그인
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>로그인</DialogTitle>
           <DialogDescription>
-            Google 계정으로 로그인하거나 테스트 계정을 사용하세요.
+            Google 계정으로 로그인하세요.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleLogin} className="grid gap-4 py-4" noValidate>
-          {/* Google 로그인 버튼 - 가장 위에 배치 */}
+        <div className="grid gap-4 py-4">
+          {/* Google 로그인 버튼 */}
           <div className="w-full">
             <Button
               onClick={handleGoogleLogin}
@@ -112,66 +70,10 @@ export function LoginDialog({ onLogin }: LoginDialogProps) {
               <span className="text-base font-medium">Google로 로그인</span>
             </Button>
           </div>
-
-          {/* 구분선 */}
-          <div className="relative my-2">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-3 text-gray-500 font-medium">또는</span>
-            </div>
-          </div>
-
-          {/* 테스트 계정 로그인 */}
-          <div className="space-y-2">
-            <label htmlFor="username" className="text-sm font-medium">
-              아이디
-            </label>
-            <Input
-              id="username"
-              name="username"
-              type="text"
-              autoComplete="username"
-              placeholder="hong / kim / lee"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              onKeyPress={handleKeyPress}
-            />
-          </div>
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium">
-              비밀번호
-            </label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              placeholder="password123"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyPress={handleKeyPress}
-            />
-          </div>
           {error && (
-            <div className="text-sm text-red-500">{error}</div>
+            <div className="text-sm text-red-500 text-center">{error}</div>
           )}
-          <div className="bg-purple-50 p-3 rounded-lg text-xs text-gray-600">
-            <div className="font-semibold mb-1">테스트 계정:</div>
-            <div>• hong / password123 (홍길동)</div>
-            <div>• kim / password123 (김민수)</div>
-            <div>• lee / password123 (이영희)</div>
-          </div>
-          <Button 
-            type="submit"
-            name="test-login"
-            id="test-login-button"
-            className="w-full bg-[#7c3aed] hover:bg-[#6d28d9]"
-          >
-            테스트 계정으로 로그인
-          </Button>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -19,6 +19,13 @@ export interface UserProfile {
     avoidIngredients?: string[];
     preferNatural?: boolean;
   };
+  conversationHistory?: Array<{
+    date: string;
+    userMessage: string;
+    assistantMessage: string;
+    symptoms: string[];
+    recommendedMedications?: string[];
+  }>; // 대화 기록
 }
 
 // 간단한 인메모리 저장소 (실제로는 데이터베이스 사용)
@@ -114,6 +121,100 @@ export function recordSymptom(userId: string, symptom: string): void {
       symptoms.push(symptom);
       updateUserProfile(userId, { previousSymptoms: symptoms });
     }
+  }
+}
+
+// 대화 기록 저장
+export function saveConversation(
+  userId: string,
+  userMessage: string,
+  assistantMessage: string,
+  symptoms: string[],
+  recommendedMedications?: string[]
+): void {
+  const profile = users.get(userId);
+  if (profile) {
+    const history = profile.conversationHistory || [];
+    history.push({
+      date: new Date().toISOString(),
+      userMessage,
+      assistantMessage,
+      symptoms,
+      recommendedMedications,
+    });
+    updateUserProfile(userId, { conversationHistory: history });
+    
+    // 증상도 기록
+    symptoms.forEach(symptom => recordSymptom(userId, symptom));
+  }
+}
+
+// 대화 기록 분석으로 사용자 특성 업데이트
+export function updateUserCharacteristicsFromConversations(userId: string): void {
+  const profile = users.get(userId);
+  if (!profile || !profile.conversationHistory) return;
+  
+  const history = profile.conversationHistory;
+  
+  // 자주 나타나는 증상으로 체질 추론
+  const symptomFrequency: { [key: string]: number } = {};
+  history.forEach(conv => {
+    conv.symptoms.forEach(symptom => {
+      symptomFrequency[symptom] = (symptomFrequency[symptom] || 0) + 1;
+    });
+  });
+  
+  // 자주 나타나는 증상들
+  const frequentSymptoms = Object.entries(symptomFrequency)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([symptom]) => symptom);
+  
+  // 체질 분석 업데이트
+  let newBodyType = profile.bodyType || "평상형";
+  
+  if (frequentSymptoms.some(s => s.includes("알레르기") || s.includes("민감"))) {
+    newBodyType = "민감형";
+  } else if (frequentSymptoms.some(s => s.includes("만성") || s.includes("관리"))) {
+    newBodyType = "관리형";
+  } else if (history.length > 5) {
+    // 충분한 대화 기록이 있으면 더 정확한 체질 분석
+    const allSymptoms = history.flatMap(conv => conv.symptoms);
+    const uniqueSymptoms = Array.from(new Set(allSymptoms));
+    
+    if (uniqueSymptoms.length > 5) {
+      newBodyType = "복합형";
+    }
+  }
+  
+  if (newBodyType !== profile.bodyType) {
+    updateUserProfile(userId, { bodyType: newBodyType });
+  }
+  
+  // 자주 추천되는 약 성분 파악
+  const ingredientPreferences: { [key: string]: number } = {};
+  history.forEach(conv => {
+    conv.recommendedMedications?.forEach(medName => {
+      // 약 이름에서 성분 추론 (실제로는 medications.ts에서 가져와야 함)
+      if (medName.includes("타이레놀")) {
+        ingredientPreferences["파라세타몰"] = (ingredientPreferences["파라세타몰"] || 0) + 1;
+      }
+    });
+  });
+  
+  // 선호 성분 업데이트
+  if (Object.keys(ingredientPreferences).length > 0) {
+    const preferredIngredients = Object.entries(ingredientPreferences)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([ingredient]) => ingredient);
+    
+    updateUserProfile(userId, {
+      preferences: {
+        ...profile.preferences,
+        preferNatural: false, // 필요시 대화에서 추론
+      },
+    });
   }
 }
 
