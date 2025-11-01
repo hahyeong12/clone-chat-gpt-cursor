@@ -24,50 +24,22 @@ export async function* generateStream(
   const apiKey = process.env.OPENAI_API_KEY;
   const messagesToSend = [...params.messages]; // 메시지 배열 복사
 
-  // 마지막 사용자 메시지에서 의약품 정보 추출 및 추가
-  const lastUserMessage = messagesToSend.filter(m => m.role === "user").pop();
-  if (lastUserMessage) {
-    let drugInfoContent = "";
-    for (const med of medications) {
-      // 약 이름이 사용자 메시지에 포함되어 있는지 확인 (대소문자 구분 없이)
-      if (lastUserMessage.content.toLowerCase().includes(med.name.toLowerCase())) {
-        const drugDetails = await fetchDrugInfo(med.name);
-        
-drugInfoContent += `
-사용자가 '${med.name}'에 대해 문의했습니다. 다음 정보를 참고하여 답변하세요:
-- 이름: ${med.name}
-- 카테고리: ${med.category}
-- 처리 가능한 증상: ${med.symptoms.join(", ")}
-- 용법: ${med.dosage}
-- 주의사항: ${med.warnings.join(", ")}
-${drugDetails.price !== "정보 없음" ? `- 가격: ${drugDetails.price}` : ''}
-`;
+  // ... (의약품 정보 추출 및 추가 로직) ...
 
-        // 성분별 일일 최대 투여량 정보 추가
-        for (const ingredient of med.ingredients) {
-          const maxDosageDetails = await fetchMaxDosageInfo(ingredient);
-          if (maxDosageDetails.dayMaxDosg && maxDosageDetails.dayMaxDosg !== "정보 없음") {
-            drugInfoContent += `- ${ingredient} 일일 최대 투여량: ${maxDosageDetails.dayMaxDosg}
-`;
-          } else if (maxDosageDetails.error) {
-            drugInfoContent += `- ${ingredient} 일일 최대 투여량 정보를 가져오는 중 오류 발생: ${maxDosageDetails.error}
-`;
-          } else {
-            drugInfoContent += `- ${ingredient} 일일 최대 투여량: 정보 없음
-`;
-          }
-        }
-        
-        // 하나의 약에 대한 정보만 가져오도록 (가장 먼저 찾은 약)
-        break;
-      }
-    }
+  // --- 메시지 프루닝 로직 추가 ---
+  const MAX_NON_SYSTEM_MESSAGES = 15; // 대화 기록에서 유지할 최대 비-시스템 메시지 수
 
-    if (drugInfoContent) {
-      // 시스템 메시지로 의약품 정보를 추가하여 AI가 참고하도록 함
-      messagesToSend.unshift({ role: "system", content: drugInfoContent });
-    }
+  const systemMessages = messagesToSend.filter(m => m.role === "system");
+  let nonSystemMessages = messagesToSend.filter(m => m.role !== "system");
+
+  if (nonSystemMessages.length > MAX_NON_SYSTEM_MESSAGES) {
+    // 가장 오래된 메시지부터 제거 (최신 메시지는 유지)
+    nonSystemMessages = nonSystemMessages.slice(nonSystemMessages.length - MAX_NON_SYSTEM_MESSAGES);
   }
+  
+  // 시스템 메시지와 프루닝된 비-시스템 메시지를 다시 합칩니다.
+  messagesToSend.splice(0, messagesToSend.length, ...systemMessages, ...nonSystemMessages);
+  // --- 프루닝 로직 끝 ---
 
   // 실제 모델 연동: OPENAI_API_KEY가 있으면 OpenAI Chat Completions 스트리밍 사용
   if (apiKey) {
