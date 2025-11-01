@@ -24,10 +24,10 @@ export default function Home() {
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    initializeTestUsers();
+    // initializeTestUsers(); // 테스트 계정 초기화 제거
   }, []);
 
-  // NextAuth 세션 변경 시 사용자 프로필 로드
+  // NextAuth 세션 변경 시 사용자 프로필 로드 및 대화 내역 로드
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
       const userId = session.user.id || session.user.email || "";
@@ -35,25 +35,51 @@ export default function Home() {
       const name = session.user.name || "사용자";
       
       if (userId) {
-        // Google 로그인 사용자 프로필 가져오기 또는 생성
         const userProfile = getOrCreateGoogleUser(userId, email, name);
         setCurrentUser(userProfile);
-        
-        // 환영 메시지 설정 (메시지가 없을 때만)
-        if (messages.length === 0) {
-          setMessages([{
-            id: crypto.randomUUID(),
-            role: "assistant",
-            content: `안녕하세요, ${userProfile.username}님! 약장수입니다. 어떤 증상으로 불편하신가요?`
-          }]);
-        }
+
+        // 이전 대화 내역 로드
+        const loadConversations = async () => {
+          try {
+            const response = await fetch("/api/conversations", {
+              headers: {
+                Authorization: `Bearer ${session.idToken}`,
+              },
+            });
+            if (!response.ok) {
+              throw new Error(`Failed to fetch conversations: ${response.status}`);
+            }
+            const data = await response.json();
+
+            if (data && data.length > 0) {
+              // 모든 대화의 메시지를 하나의 배열로 합칩니다.
+              const allMessages = data.flatMap((conv: any) => conv.conversation);
+              setMessages(allMessages);
+            } else {
+              // 이전 대화가 없으면 환영 메시지 설정
+              setMessages([{
+                id: crypto.randomUUID(),
+                role: "assistant",
+                content: `안녕하세요, ${userProfile.username}님! 약장수입니다. 어떤 증상으로 불편하신가요?`
+              }]);
+            }
+          } catch (error) {
+            console.error("Error loading conversations:", error);
+            // 에러 발생 시에도 환영 메시지 설정
+            setMessages([{
+              id: crypto.randomUUID(),
+              role: "assistant",
+              content: `안녕하세요, ${userProfile.username}님! 약장수입니다. 어떤 증상으로 불편하신가요?`
+            }]);
+          }
+        };
+        loadConversations();
       }
     } else if (status === "unauthenticated") {
-      // 로그아웃 상태면 사용자 정보 초기화
+      // 로그아웃 상태면 사용자 정보 및 메시지 초기화
       if (currentUser) {
         setCurrentUser(null);
-        // 로그아웃 시 메시지 초기화 (선택적)
-        // setMessages([]); 
+        setMessages([]); 
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -89,14 +115,7 @@ export default function Home() {
     }
   }
 
-  const handleLogin = (user: UserProfile) => {
-    setCurrentUser(user);
-    setMessages([{
-      id: crypto.randomUUID(),
-      role: "assistant",
-      content: `안녕하세요, ${user.username}님! 약장수 챗봇입니다. 어떤 증상으로 불편하신가요?`
-    }]);
-  };
+
 
   const handleLogout = async () => {
     // NextAuth 세션이 있으면 NextAuth 로그아웃, 없으면 로컬 로그아웃
@@ -148,7 +167,7 @@ export default function Home() {
                 로그아웃
               </Button>
             ) : (
-              <LoginDialog onLogin={handleLogin} />
+              <LoginDialog />
             )}
           </div>
         </header>
