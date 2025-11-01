@@ -361,7 +361,7 @@ export const symptomCategories: SymptomCategory[] = [
         id: "sleep-insomnia",
         title: "불면증이 있을 때",
         description: "잠이 오지 않음",
-        medications: ["med_006", "med_001"]
+        medications: ["med_006"]
       },
       {
         id: "sleep-stress",
@@ -380,13 +380,13 @@ export const symptomCategories: SymptomCategory[] = [
         id: "dizziness-general",
         title: "일반적인 어지러움",
         description: "현기증, 멀미",
-        medications: ["med_016", "med_003"]
+        medications: ["med_016"]
       },
       {
         id: "dizziness-motion-sickness",
         title: "멀미가 날 때",
         description: "차량 멀미, 배멀미",
-        medications: ["med_016", "med_003"]
+        medications: ["med_016"]
       }
     ]
   },
@@ -482,13 +482,13 @@ export const symptomCategories: SymptomCategory[] = [
         id: "skin-rash",
         title: "발진이 날 때",
         description: "피부 발진, 알레르기 반응",
-        medications: ["med_007", "med_001"]
+        medications: ["med_007"]
       },
       {
         id: "skin-itchy",
         title: "피부가 가려울 때",
         description: "가려움, 알레르기",
-        medications: ["med_007", "med_001"]
+        medications: ["med_007"]
       },
       {
         id: "skin-allergy",
@@ -513,7 +513,7 @@ export const symptomCategories: SymptomCategory[] = [
         id: "ear-ringing",
         title: "귀울림이 있을 때",
         description: "이명, 귀에서 소리가 남",
-        medications: ["med_016", "med_001"]
+        medications: ["med_016"]
       }
     ]
   },
@@ -609,8 +609,8 @@ export const symptomCategories: SymptomCategory[] = [
       {
         id: "menstrual-irregular",
         title: "생리 불순이 있을 때",
-        description: "생리 주기 불규칙, 생리량 이상",
-        medications: ["med_013", "med_002"]
+        description: "생리 주기 불규칙, 생리량 이상 - 호르몬 문제일 수 있으므로 의사 상담 권장",
+        medications: ["med_017", "med_013"]
       },
       {
         id: "menstrual-pms",
@@ -1156,8 +1156,8 @@ export const medicationDetails: { [key: string]: MedicationDetail } = {
   },
   "med_013": {
     id: "med_013",
-    name: "포비돈정",
-    category: "진통제",
+    name: "나프록센정",
+    category: "진통제/소염제",
     characteristics: "나프록센 성분의 소염진통제로 생리통에 특효가 있으며, 자궁 수축으로 인한 통증을 완화합니다.",
     comparisonNote: "생리통에 특히 효과적이며, 생리 시작 전 미리 복용하면 더욱 효과적입니다. 효과 지속 시간이 길어(6-8시간) 편리하지만, 위장 장애 위험이 있어 식후 복용이 필수입니다.",
     effects: [
