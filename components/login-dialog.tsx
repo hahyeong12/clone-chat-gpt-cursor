@@ -14,7 +14,7 @@ import { type UserProfile, getOrCreateGoogleUser } from "@/lib/user-profile";
 import { signIn } from "next-auth/react";
 
 interface LoginDialogProps {
-  onLogin: (user: UserProfile) => void;
+  onLogin?: (user: UserProfile) => void;
 }
 
 export function LoginDialog({ onLogin }: LoginDialogProps) {

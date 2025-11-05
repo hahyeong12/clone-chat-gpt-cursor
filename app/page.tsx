@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { sendChat, type ClientMessage } from "@/lib/stream";
 import { LoginDialog } from "@/components/login-dialog";
-import { initializeTestUsers, type UserProfile, getOrCreateGoogleUser, getUserProfile } from "@/lib/user-profile";
+import { type UserProfile, getOrCreateGoogleUser, getUserProfile } from "@/lib/user-profile";
 import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
 import { useChat } from "@/lib/chat-context";
 import { SpinningPill } from "@/components/ui/spinning-pill";

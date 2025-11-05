@@ -10,7 +10,7 @@ function ScrollArea({
   children,
   viewportRef,
   ...props
-}: React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & { viewportRef?: React.RefObject<HTMLDivElement> }) {
+}: React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & { viewportRef?: React.RefObject<HTMLDivElement | null> }) {
   return (
     <ScrollAreaPrimitive.Root
       data-slot="scroll-area"
