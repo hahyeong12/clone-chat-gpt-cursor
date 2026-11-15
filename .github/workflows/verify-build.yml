@@ -14,6 +14,7 @@ on:
       - "tsconfig.json"
       - "postcss.config.mjs"
       - ".github/workflows/verify-build.yml"
+      - "scripts/**"
   workflow_dispatch:
 
 permissions:
@@ -33,3 +34,11 @@ jobs:
         run: npm ci
       - name: Build original Next.js app
         run: npm run build
+      - name: Smoke test real Next.js server and API
+        run: node scripts/smoke-test.mjs
+      - name: Install temporary browser-test dependencies
+        run: |
+          npm install --no-save --package-lock=false playwright
+          npx playwright install --with-deps chromium
+      - name: Browser interaction smoke test
+        run: node scripts/browser-smoke.mjs
