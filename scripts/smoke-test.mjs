@@ -87,7 +87,7 @@ try {
     // The 2025 app emits one SSE data line per character. Rejoin the data values
     // before comparing complete Korean phrases; checking raw lines would be false.
     const assembled = body
-      .split(/\\r?\\n/)
+      .split(/\r?\n/)
       .filter((line) => line.startsWith("data: "))
       .map((line) => line.slice(6))
       .filter((chunk) => chunk !== "[DONE]")
