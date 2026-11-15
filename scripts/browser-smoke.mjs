@@ -73,11 +73,12 @@ try {
   await input.fill("안녕하세요");
   await page.getByRole("button", { name: "보내기" }).click();
   await page.getByText("안녕하세요", { exact: true }).waitFor();
-  // A completed assistant reply should add a second instance of the same welcome text.
+  // The login greeting includes the username, while the API greeting does not.
+  // Wait for the API reply itself rather than incorrectly requiring two copies.
   await page.waitForFunction(() =>
     [...document.querySelectorAll("div")].filter((x) =>
       x.textContent?.trim() === "안녕하세요! 약장수 챗봇입니다. 어떤 증상으로 불편하신가요?"
-    ).length >= 2
+    ).length >= 1
   );
   console.log("PASS: browser submits and renders chatbot reply");
 
