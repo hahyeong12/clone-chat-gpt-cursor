@@ -81,7 +81,7 @@ try {
   );
   console.log("PASS: browser submits and renders chatbot reply");
 
-  assert.equal(browserErrors.length, 0, \`Browser uncaught errors: \${browserErrors.join("; ")}\`);
+  assert.equal(browserErrors.length, 0, "Browser uncaught errors: " + browserErrors.join("; "));
   console.log("RESULT: Browser UI flow passed with known limitation(s) listed above");
 } catch (error) {
   console.error("BROWSER SMOKE FAILED:", error?.stack ?? error);
