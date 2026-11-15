@@ -1,9 +1,3 @@
-
-
-https://github.com/user-attachments/assets/294468a8-3fbe-4f0e-aff5-115607e62297
-
-
-
 # 약장수 (Yakjangsu)
 
 **2025년 가을 · 첫 해커톤 · 3인 팀 · Next.js / TypeScript / Cursor**
@@ -21,7 +15,9 @@ GitHub About에 등록된 기존 Vercel 데모 주소를 사용합니다. 소스
 
 ### 🎬 2025년 실제 시연 영상
 
-**[▶ 약장수 해커톤 시연 영상 보기 (MP4 · 약 66초)](yakjangsu_demo_2025_download_v2.mp4)**
+https://github.com/user-attachments/assets/294468a8-3fbe-4f0e-aff5-115607e62297
+
+**[영상 파일 다운로드 (MP4 · 약 66초)](yakjangsu_demo_2025_download_v2.mp4)**
 
 2025년 10월 28일 촬영된 로컬 실행 화면의 **압축본**입니다. 의약품 검색·카테고리 필터와 챗봇 화면을 살펴볼 수 있습니다. 원본 녹화 파일은 별도로 보관하며, 영상은 기능 시연 기록이지 의료적 정확성이나 안전성을 증명하는 자료는 아닙니다.
 
