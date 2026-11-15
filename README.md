@@ -1,278 +1,97 @@
-# 요구사항
+# 약장수 (Yakjangsu)
 
-## 프로젝트 목표
+> **2025년 가을, 처음 참여한 3인 팀 해커톤에서 만든 의약품 정보 검색·증상 기반 챗봇 프로토타입**
+>
+> 완성된 의료 서비스보다는, **개발을 잘 모르던 시기에 AI 코딩 도구를 활용해 처음으로 웹 서비스를 만들어 본 기록**입니다.
 
-Chat GPT와 유사한 채팅 AI Application을 구현하는 것입니다.
+**개발 시기:** 2025년 10월경 · **형태:** 3인 팀 해커톤 · **사용 도구:** Cursor · **프로젝트 성격:** 학습·시연용
 
-## 사용하는 기술 스텍
+> [!IMPORTANT]
+> **실제 의료용 서비스가 아닙니다.** 의약품 데이터의 제품명·성분·효능·용법 등에 검증되지 않았거나 잘못된 정보가 있으며, 추천 로직은 의료적 안전성을 보장하지 않습니다. 복용·진단·처방 판단에 이 프로젝트를 사용하지 마세요. 이 저장소는 **2025년 당시 개발 결과물과 학습 과정을 보존하는 아카이브**입니다.
 
-- UI라이브러리
-    -TailwindCSS : https://tailwindcss.com/
-    -shadcn/ui : https://ui.shadcn.com/
--AI SDK
-    - AI SDK : https://ai-sdk.dev/docs/introduction
+## 어떤 프로젝트인가요?
 
-## 구현단계
+'약장수'는 사용자가 약 이름이나 증상으로 의약품 정보를 찾아보고, 채팅창에 증상을 입력하면 관련 정보를 응답하도록 만든 웹 프로토타입입니다.
 
-### Step 1. 초기 셋업(Next.js, Tailwind 4, shadcn/ui)
-- 의존성 설치
-  ```bash
-  npm i
-  npm i -D tailwindcss @tailwindcss/postcss
-  ```
-- Tailwind 4 활성화
-  - `app/globals.css` 최상단에 추가:
-    ```css
-    @import "tailwindcss";
-    ```
-- shadcn/ui 초기화(선택)
-  ```bash
-  # shadcn/ui CLI 설치
-  npx shadcn@latest init
-  # Button 등 필요한 컴포넌트 추가
-  npx shadcn@latest add button input textarea sheet dialog scrollbar
-  ```
-- 동작 확인
-  - `npm run dev` 실행 후 기본 페이지가 Tailwind 스타일로 렌더링되는지 확인
+2025년 첫 해커톤에 참여했을 당시 우리 팀은 세 명이었지만, 각자 어떤 일을 맡고 어떻게 협업해야 하는지도 명확하지 않았습니다. 저 역시 웹 개발과 협업에 익숙하지 않았습니다. 그 상황에서 **Cursor 유료 버전을 직접 사용하며 구현을 진행했고**, 적어도 동작하는 화면과 사용자 흐름을 만들어 보고자 했습니다.
 
-수용기준
-- 홈 화면에서 Tailwind 유틸리티 클래스 적용 확인
-- shadcn/ui 버튼/입력 필드 렌더 테스트
+지금 돌아보면 설계와 검증이 부족한 부분이 많습니다. 그렇지만 이 경험이 이후 개발과 팀 협업을 배우는 출발점이 되었습니다. 당시의 부족함까지 포함해 기록으로 남기려고 합니다.
 
----
+## 시연 당시 구현한 것
 
-### Step 2. API 라우트(스트리밍 응답)
-- `app/api/chat/route.ts` 생성
-  ```ts
-  import { NextRequest } from "next/server";
+| 기능 | 확인된 구현 내용 |
+| --- | --- |
+| 의약품 목록 | 코드에 정의된 의약품 항목 20개를 카드로 표시 |
+| 검색·필터 | 약 이름/증상 텍스트 검색과 카테고리 선택 |
+| 채팅 화면 | 사용자가 증상을 입력하고 답변을 받는 인터페이스 |
+| 증상 처리 | 키워드·정규식·조건문으로 증상을 분류하는 **규칙 기반 로직** |
+| 사용자 예시 | 세 가지 테스트 프로필, 간단한 로그인 UI |
+| 응답 표현 | SSE 형식으로 문자 단위 응답을 순차 전송 |
 
-  export const runtime = "edge"; // 스트리밍 지연 단축(선택)
+**영상 기록:** 2025년 10월 말에 촬영된 로컬 시연 영상이 개인 기록으로 남아 있습니다. 영상에서는 **의약품 검색 → 카테고리 필터링 → 챗봇 대화** 화면을 확인할 수 있습니다. 원본 영상은 현재 저장소에 업로드하지 않았습니다.
 
-  export async function POST(req: NextRequest) {
-    try {
-      const body = await req.json();
-      // 입력 검증
-      if (!Array.isArray(body?.messages) || !body?.model) {
-        return new Response(
-          JSON.stringify({ error: { code: "BAD_REQUEST", message: "messages, model 필수" } }),
-          { status: 400, headers: { "Content-Type": "application/json" } }
-        );
-      }
+## 기술 구성
 
-      // 실제 모델 호출 대신 데모 스트림 생성
-      const encoder = new TextEncoder();
-      const stream = new ReadableStream({
-        start(controller) {
-          const tokens = ["안", "녕", "하", "세", "요", "!"];
-          let i = 0;
-          const timer = setInterval(() => {
-            if (i < tokens.length) {
-              controller.enqueue(encoder.encode(`data: ${tokens[i++]}\n\n`));
-            } else {
-              controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
-              clearInterval(timer);
-              controller.close();
-            }
-          }, 150);
-        },
-      });
+- **웹:** Next.js 15 / React 19 / TypeScript
+- **UI:** Tailwind CSS 4 / Radix UI 계열 컴포넌트
+- **서버:** Next.js API Route (`app/api/chat/route.ts`)
+- **데이터:** TypeScript 파일에 정의한 정적 의약품 목록
+- **응답:** Server-Sent Events(SSE) 형식의 문자 단위 스트림
+- **개발 보조 도구:** Cursor
 
-      return new Response(stream, {
-        headers: {
-          "Content-Type": "text/event-stream; charset=utf-8",
-          "Cache-Control": "no-cache, no-transform",
-          Connection: "keep-alive",
-        },
-      });
-    } catch (err) {
-      return new Response(
-        JSON.stringify({ error: { code: "INTERNAL", message: "서버 오류" } }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
-  }
-  ```
-- 실제 모델 연동 시: `lib/ai.ts`에 모델 어댑터 작성 후 위 라우트에서 호출
+```mermaid
+flowchart LR
+    U[사용자] --> S[의약품 검색 화면 /home]
+    U --> C[챗봇 화면 /]
+    S --> D[정적 의약품 데이터]
+    C --> A[POST /api/chat]
+    A --> R[규칙 기반 증상 분류 및 응답 생성]
+    R --> D
+    R --> T[SSE 문자 스트림]
+    T --> C
+```
 
-수용기준
-- `curl -N -X POST http://localhost:3000/api/chat -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"안녕"}],"model":"demo"}'` 실행 시 토큰이 순차 전송
+**AI 관련 표현에 관하여:** 저장소에는 OpenAI API를 호출하는 별도 코드(`lib/ai.ts`)가 있으나, 현재 실제 채팅 엔드포인트는 그 코드를 사용하지 않습니다. 따라서 현재 동작을 **LLM 기반 의료 상담**이라고 소개하지 않습니다.
+
+## 실행 방법
+
+Node.js와 npm이 필요합니다.
+
+```bash
+npm install
+npm run dev
+```
+
+브라우저에서 `http://localhost:3000/home`(검색) 또는 `http://localhost:3000/`(챗봇)을 엽니다.
+
+이것은 **2025년 소스 기준 실행 안내**이며, 최근 환경에서 설치·빌드·실행 성공 여부를 별도로 검증한 것은 아닙니다. 데모를 실행하더라도 의약품 관련 답변은 의료 정보로 신뢰해서는 안 됩니다.
+
+## 제가 이 경험에서 배운 것
+
+당시에는 **무언가 동작하게 만드는 것**이 가장 큰 목표였습니다. 시간이 지난 뒤 코드를 다시 보니, 그다음에는 **왜 그런 구조를 선택했는지, 데이터가 정확한지, 사용자에게 어떤 위험이 있는지, 팀원이 어떻게 이어서 작업할 수 있는지**까지 책임져야 한다는 것을 알게 됐습니다.
+
+- **잘했던 시도:** 익숙하지 않은 기술을 피하지 않고 도구를 활용해 검색·챗봇 형태를 구현해 본 것
+- **부족했던 점:** 역할과 요구사항 정리, 검증 가능한 데이터, 명확한 API 경계, 기능 테스트 및 실제 AI 연동 구분
+- **다시 만든다면:** 요구사항과 팀 역할부터 정하고, 검증된 정보 출처와 테스트를 마련하며, 의료 추천이 아닌 안전한 정보 탐색 범위로 기능을 제한할 것
+
+보다 자세한 회고는 [2025년 해커톤 개발 회고](docs/retrospective-2025.md), 코드 재검토 내용은 [기술 검토 노트](docs/technical-review.md)에 정리했습니다.
+
+## 1년 뒤의 개발 경험
+
+2026년에는 컴퓨터공학 관련 5개 학술 동아리가 참여한 연합 해커톤에서, **EIDOS** 프로젝트의 백엔드 담당자로 참여했습니다. 그때는 AI·프론트엔드·백엔드로 역할을 나누고, API 계약·저장·작업 상태·예외 상황·테스트·협업 기록을 고려하며 개발했습니다.
+
+2025년의 '약장수'와 2026년의 EIDOS는 기술 수준만이 아니라 **개발을 바라보는 관점이 어떻게 달라졌는지** 비교할 수 있는 두 기록입니다.
+
+→ [2026 EIDOS 해커톤 팀 저장소](https://github.com/2026ENDPoinT/team19)
+
+## 저장소 보존 원칙
+
+- 당시의 **원본 애플리케이션 코드는 가능한 그대로 보존**합니다.
+- 현재의 회고·기술 검토와 당시 작성한 가이드를 **서로 구분**합니다.
+- 초기 README는 [archive/README_before_portfolio.md](archive/README_before_portfolio.md)에 별도로 복사했습니다.
+- 2025년 작업을 사후에 과장하거나, AI 코딩 도구의 기여를 개인의 직접 구현 능력으로 부풀리지 않습니다.
+- 이 프로젝트는 **3인 팀 작업**이며, 개별 코드별 작성자 및 역할 분담은 현재 자료만으로 확정할 수 없습니다.
 
 ---
 
-### Step 3. 프론트엔드 연동(스트림 수신/렌더)
-- 스트림 수신 유틸: `lib/stream.ts` 생성
-  ```ts
-  export async function* readSSE(res: Response) {
-    const reader = res.body!.getReader();
-    const decoder = new TextDecoder();
-    let buf = "";
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      buf += decoder.decode(value, { stream: true });
-      let idx;
-      while ((idx = buf.indexOf("\n\n")) >= 0) {
-        const chunk = buf.slice(0, idx).trim();
-        buf = buf.slice(idx + 2);
-        if (chunk.startsWith("data: ")) {
-          const payload = chunk.slice(6);
-          if (payload === "[DONE]") return;
-          yield payload;
-        }
-      }
-    }
-  }
-
-  export async function sendChat({ messages, model, temperature, max_tokens }: any) {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages, model, temperature, max_tokens }),
-    });
-    if (!res.ok && res.headers.get("content-type")?.includes("application/json")) {
-      const data = await res.json();
-      throw new Error(data?.error?.message || "요청 실패");
-    }
-    return readSSE(res);
-  }
-  ```
-- 페이지에 연결: `app/page.tsx` 교체(간단 채팅 MVP)
-  ```tsx
-  "use client";
-  import { useEffect, useRef, useState } from "react";
-  import { sendChat } from "@/lib/stream";
-
-  type Role = "user" | "assistant" | "system";
-  type Message = { id: string; role: Role; content: string };
-
-  export default function Home() {
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [input, setInput] = useState("");
-    const [loading, setLoading] = useState(false);
-    const listRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-      listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
-    }, [messages]);
-
-    async function onSend() {
-      const content = input.trim();
-      if (!content || loading) return;
-      setInput("");
-      const userMsg: Message = { id: crypto.randomUUID(), role: "user", content };
-      const asstMsg: Message = { id: crypto.randomUUID(), role: "assistant", content: "" };
-      setMessages((prev) => [...prev, userMsg, asstMsg]);
-      setLoading(true);
-      try {
-        const stream = await sendChat({
-          messages: messages.concat(userMsg).map(({ role, content }) => ({ role, content })),
-          model: "demo",
-          temperature: 0.7,
-          max_tokens: 512,
-        });
-        for await (const token of stream) {
-          setMessages((prev) =>
-            prev.map((m) => (m.id === asstMsg.id ? { ...m, content: m.content + token } : m))
-          );
-        }
-      } catch (e: any) {
-        setMessages((prev) =>
-          prev.map((m) => (m.id === asstMsg.id ? { ...m, content: `[오류] ${e.message}` } : m))
-        );
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        onSend();
-      }
-    }
-
-    return (
-      <div className="min-h-screen flex flex-col items-center px-4 py-8 gap-4">
-        <main className="w-full max-w-2xl flex-1 flex flex-col border rounded-lg p-4">
-          <div ref={listRef} className="flex-1 overflow-y-auto space-y-3 pr-2">
-            {messages.map((m) => (
-              <div
-                key={m.id}
-                className={m.role === "user" ? "text-right" : "text-left"}
-              >
-                <div
-                  className={
-                    "inline-block rounded-lg px-3 py-2 " +
-                    (m.role === "user"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 dark:bg-gray-800")
-                  }
-                >
-                  {m.content || (m.role === "assistant" && loading ? "..." : "")}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 flex items-end gap-2">
-            <textarea
-              className="flex-1 resize-none h-24 border rounded-md p-2"
-              placeholder="메시지를 입력하고 Enter로 전송(Shift+Enter 줄바꿈)"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={onKeyDown}
-            />
-            <button
-              onClick={onSend}
-              disabled={loading || !input.trim()}
-              className="h-10 px-4 rounded-md bg-black text-white disabled:opacity-50"
-            >
-              전송
-            </button>
-          </div>
-        </main>
-      </div>
-    );
-  }
-  ```
-
-수용기준
-- 메시지 입력 후 Enter 시 바로 사용자 메시지가 표시되고, 어시스턴트 답변이 토큰 단위로 증가
-- 로딩 중 입력 비활성화 또는 시각적 피드백 제공
-
----
-
-### Step 4. UI 컴포넌트 분리(shadcn/ui 적용)
-- 파일 구성
-  - `components/ChatList.tsx`: 역할별 버블, 자동 스크롤 지원
-  - `components/ChatInput.tsx`: 멀티라인, 단축키, 전송 버튼
-  - `components/Header.tsx`: 새 대화, 설정 열기
-  - `components/SettingsSheet.tsx`: 모델/온도/토큰/시스템 프롬프트
-- 스타일 가이드
-  - 다크모드 지원, 키보드 포커스 링, 접근성 속성(aria-label/role) 적용
-- 페이지에서 컴포넌트 사용하도록 교체
-
-수용기준
-- 모바일/데스크탑 반응형 정상
-- 단축키(Enter/Shift+Enter) 정상
-- 설정 변경 시 다음 요청부터 반영
-
----
-
-### Step 5. 배포(Vercel)
-- 환경 변수 설정
-  - 실제 모델 연동 시(지금은 데모 스트림이므로 생략 가능)
-    - 로컬: `.env.local`
-      - `OPENAI_API_KEY=...` (예시: OpenAI 사용 시)
-      - `DEFAULT_MODEL=openai:gpt-4o-mini` (선택)
-    - Vercel: Project Settings → Environment Variables에 동일 키 추가
-- 빌드/배포
-  ```bash
-  npm run build
-  npm start  # 로컬 프로덕션 확인
-  ```
-  - Vercel에 Git 연동 → `Deploy` 버튼
-- 서버 로그/오류 확인
-  - 스트리밍 정상 동작, 400/500 처리 확인
-
-수용기준
-- 프로덕션 URL에서 입력/스트리밍/반응형/UI 상태 이상 없음
+*2025년에 만들었던 것을 2026년에 다시 읽고 정리한 개인 포트폴리오 기록입니다.*
