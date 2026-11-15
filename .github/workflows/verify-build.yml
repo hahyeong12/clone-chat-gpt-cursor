@@ -1,0 +1,35 @@
+name: Verify legacy app build
+
+# This verification workflow was added during the 2026 portfolio review.
+# It is not presented as part of the original 2025 hackathon implementation.
+on:
+  pull_request:
+    paths:
+      - "app/**"
+      - "components/**"
+      - "lib/**"
+      - "package.json"
+      - "package-lock.json"
+      - "next.config.ts"
+      - "tsconfig.json"
+      - "postcss.config.mjs"
+      - ".github/workflows/verify-build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+      - name: Install dependencies from lockfile
+        run: npm ci
+      - name: Build original Next.js app
+        run: npm run build

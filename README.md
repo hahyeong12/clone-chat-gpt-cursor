@@ -1,278 +1,105 @@
-# 요구사항
+# 약장수 (Yakjangsu)
 
-## 프로젝트 목표
+**2025년 가을 · 첫 해커톤 · 3인 팀 · Next.js / TypeScript / Cursor**
 
-Chat GPT와 유사한 채팅 AI Application을 구현하는 것입니다.
+> 처음 해커톤에 참여했을 때, 우리 세 명은 각자 무엇을 맡아야 하는지조차 선명하게 정하지 못했습니다. 저는 Cursor를 유료 결제해 개발에 활용했고, 모르는 것이 많은 상태에서 일단 동작하는 웹 서비스를 만들기 위해 시도했습니다. 이 저장소는 그 **첫 개발 경험의 결과물과, 1년 뒤 되돌아본 배움**을 함께 남긴 기록입니다.
 
-## 사용하는 기술 스텍
+**한 줄 소개:** 약 이름·증상으로 정보를 찾아보고, 증상 입력에 정해진 규칙으로 답하는 **의약품 검색·챗봇 프로토타입**입니다. 상용 의료 서비스나 의학적으로 검증된 AI가 아닙니다.
 
-- UI라이브러리
-    -TailwindCSS : https://tailwindcss.com/
-    -shadcn/ui : https://ui.shadcn.com/
--AI SDK
-    - AI SDK : https://ai-sdk.dev/docs/introduction
+> [!WARNING]
+> **의료용 사용 금지.** 코드에 포함된 의약품 이름·성분·효능·용법 중에는 부정확하거나 검증되지 않은 정보가 있습니다. 이 프로젝트의 추천이나 복용 안내를 실제 의료 판단에 사용하지 마세요. 이 저장소는 **2025년 당시 소스 보존 및 학습 기록용**입니다.
 
-## 구현단계
+## 01. 왜 만들었나
 
-### Step 1. 초기 셋업(Next.js, Tailwind 4, shadcn/ui)
-- 의존성 설치
-  ```bash
-  npm i
-  npm i -D tailwindcss @tailwindcss/postcss
-  ```
-- Tailwind 4 활성화
-  - `app/globals.css` 최상단에 추가:
-    ```css
-    @import "tailwindcss";
-    ```
-- shadcn/ui 초기화(선택)
-  ```bash
-  # shadcn/ui CLI 설치
-  npx shadcn@latest init
-  # Button 등 필요한 컴포넌트 추가
-  npx shadcn@latest add button input textarea sheet dialog scrollbar
-  ```
-- 동작 확인
-  - `npm run dev` 실행 후 기본 페이지가 Tailwind 스타일로 렌더링되는지 확인
+2025년 10월경, 처음 참가한 해커톤에서 **'약장수'** 라는 이름으로 의약품 정보를 탐색하는 웹 서비스를 시도했습니다. 프로젝트 경험이 충분하지 않았고 팀 내 역할과 개발 흐름도 명확히 잡혀 있지 않았습니다.
 
-수용기준
-- 홈 화면에서 Tailwind 유틸리티 클래스 적용 확인
-- shadcn/ui 버튼/입력 필드 렌더 테스트
+그때의 제 목표는 거창한 의료 AI 구현보다 **실제로 눌러 보고 대화해 볼 수 있는 결과물을 만들어 보는 것**에 가까웠습니다. Cursor라는 AI 코딩 도구를 적극적으로 활용해 개발을 진행했으며, 이 도구의 도움을 받은 사실과 제 경험을 구분해서 기록하려고 합니다.
 
----
+이 프로젝트는 **3명이 함께한 팀 결과물**입니다. 현재 자료만으로 팀원별 코드 작성량이나 정확한 분담을 재구성할 수 없어 개인 단독 개발이라고 소개하지 않습니다.
 
-### Step 2. API 라우트(스트리밍 응답)
-- `app/api/chat/route.ts` 생성
-  ```ts
-  import { NextRequest } from "next/server";
+## 02. 실제로 만든 것
 
-  export const runtime = "edge"; // 스트리밍 지연 단축(선택)
+| 화면 / 기능 | 2025년 소스에서 확인되는 구현 |
+| --- | --- |
+| **의약품 검색** | 약 이름·증상으로 목록을 검색하고 카테고리 버튼으로 필터링 |
+| **목록 조회** | 코드에 직접 작성한 20개 항목을 카드 형태로 표시 |
+| **대화 화면** | 사용자 입력과 응답을 채팅 UI로 표시 |
+| **증상 응답** | 증상 키워드·정규식·조건문을 이용해 답변을 작성 |
+| **테스트 프로필** | 사용자 예시 3개, 로그인 형태의 화면, 알레르기·기저질환 등을 고려하려는 시도 |
+| **스트리밍 표현** | 서버가 텍스트를 SSE 형식으로 문자 단위 전송 |
 
-  export async function POST(req: NextRequest) {
-    try {
-      const body = await req.json();
-      // 입력 검증
-      if (!Array.isArray(body?.messages) || !body?.model) {
-        return new Response(
-          JSON.stringify({ error: { code: "BAD_REQUEST", message: "messages, model 필수" } }),
-          { status: 400, headers: { "Content-Type": "application/json" } }
-        );
-      }
+**2025년 10월 말의 약 66초 시연 영상**에서 의약품 목록, 카테고리 변경, 챗봇 화면 전환과 대화 모습을 확인했습니다. 원본은 개인 자료로 보존 중이며, 현재 GitHub 저장소에는 아직 올리지 않았습니다.
 
-      // 실제 모델 호출 대신 데모 스트림 생성
-      const encoder = new TextEncoder();
-      const stream = new ReadableStream({
-        start(controller) {
-          const tokens = ["안", "녕", "하", "세", "요", "!"];
-          let i = 0;
-          const timer = setInterval(() => {
-            if (i < tokens.length) {
-              controller.enqueue(encoder.encode(`data: ${tokens[i++]}\n\n`));
-            } else {
-              controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
-              clearInterval(timer);
-              controller.close();
-            }
-          }, 150);
-        },
-      });
+[시연 흐름과 영상 기록](docs/demo-record.md) · [구현 구조와 한계 상세](docs/technical-review.md)
 
-      return new Response(stream, {
-        headers: {
-          "Content-Type": "text/event-stream; charset=utf-8",
-          "Cache-Control": "no-cache, no-transform",
-          Connection: "keep-alive",
-        },
-      });
-    } catch (err) {
-      return new Response(
-        JSON.stringify({ error: { code: "INTERNAL", message: "서버 오류" } }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
-  }
-  ```
-- 실제 모델 연동 시: `lib/ai.ts`에 모델 어댑터 작성 후 위 라우트에서 호출
+## 03. 기술 구성
 
-수용기준
-- `curl -N -X POST http://localhost:3000/api/chat -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"안녕"}],"model":"demo"}'` 실행 시 토큰이 순차 전송
+| 구분 | 기술 |
+| --- | --- |
+| 웹 화면 | Next.js 15, React 19, TypeScript |
+| UI | Tailwind CSS 4, Radix UI 계열 컴포넌트 |
+| API | Next.js Route Handler (`POST /api/chat`) |
+| 데이터 | TypeScript 파일에 선언한 정적 의약품 목록 |
+| 응답 | 서버 규칙 기반 처리 + SSE 문자 스트리밍 |
+| 개발 도구 | Cursor (AI 코딩 도구) |
 
----
+```mermaid
+flowchart TD
+    U[사용자] --> S[의약품 검색 /home]
+    U --> C[챗봇 /]
+    S --> D[정적 의약품 목록]
+    C --> API[POST /api/chat]
+    API --> R[증상 패턴 분류 및 규칙 기반 답변]
+    R --> D
+    R --> SSE[SSE로 텍스트 전송]
+    SSE --> C
+```
 
-### Step 3. 프론트엔드 연동(스트림 수신/렌더)
-- 스트림 수신 유틸: `lib/stream.ts` 생성
-  ```ts
-  export async function* readSSE(res: Response) {
-    const reader = res.body!.getReader();
-    const decoder = new TextDecoder();
-    let buf = "";
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      buf += decoder.decode(value, { stream: true });
-      let idx;
-      while ((idx = buf.indexOf("\n\n")) >= 0) {
-        const chunk = buf.slice(0, idx).trim();
-        buf = buf.slice(idx + 2);
-        if (chunk.startsWith("data: ")) {
-          const payload = chunk.slice(6);
-          if (payload === "[DONE]") return;
-          yield payload;
-        }
-      }
-    }
-  }
+**'AI 챗봇'이라는 당시 이름과 실제 구현을 구별할 필요가 있습니다.** `lib/ai.ts`에는 OpenAI API 연동용 코드가 남아 있지만, **현재 의약품 챗봇의 API 경로는 해당 모델 호출 코드를 사용하지 않습니다.** 즉, 주요 응답은 LLM 추론이 아니라 규칙 기반입니다.
 
-  export async function sendChat({ messages, model, temperature, max_tokens }: any) {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages, model, temperature, max_tokens }),
-    });
-    if (!res.ok && res.headers.get("content-type")?.includes("application/json")) {
-      const data = await res.json();
-      throw new Error(data?.error?.message || "요청 실패");
-    }
-    return readSSE(res);
-  }
-  ```
-- 페이지에 연결: `app/page.tsx` 교체(간단 채팅 MVP)
-  ```tsx
-  "use client";
-  import { useEffect, useRef, useState } from "react";
-  import { sendChat } from "@/lib/stream";
+## 04. 당시 코드의 한계
 
-  type Role = "user" | "assistant" | "system";
-  type Message = { id: string; role: Role; content: string };
+- **정보의 신뢰성:** 의약품 데이터가 공식 자료로 검증되지 않았고, 일부 항목의 제품·성분·용법 정보에 오류 가능성이 있습니다.
+- **개인화 처리:** 테스트 프로필을 브라우저에서 초기화하지만 서버는 별도의 메모리 저장소에서 조회해, 기대한 개인화가 실제로 작동하지 않을 수 있습니다.
+- **인증 및 검증:** 테스트용 계정·비밀번호가 코드에 포함돼 있으며, 실제 인증 시스템이나 의료 안전성 검증을 갖추지 않았습니다.
+- **테스트 증거:** 소스에 자동 테스트와 결과 기록이 충분히 남아 있지 않습니다.
 
-  export default function Home() {
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [input, setInput] = useState("");
-    const [loading, setLoading] = useState(false);
-    const listRef = useRef<HTMLDivElement>(null);
+이러한 한계를 뒤늦게 발견한 것도 제가 성장했다는 증거라고 생각합니다. 2025년 당시의 구현과 **2026년에 추가한 기술 검토·회고**는 섞지 않고 따로 남깁니다.
 
-    useEffect(() => {
-      listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
-    }, [messages]);
+## 05. 1년 뒤에 읽어 보니
 
-    async function onSend() {
-      const content = input.trim();
-      if (!content || loading) return;
-      setInput("");
-      const userMsg: Message = { id: crypto.randomUUID(), role: "user", content };
-      const asstMsg: Message = { id: crypto.randomUUID(), role: "assistant", content: "" };
-      setMessages((prev) => [...prev, userMsg, asstMsg]);
-      setLoading(true);
-      try {
-        const stream = await sendChat({
-          messages: messages.concat(userMsg).map(({ role, content }) => ({ role, content })),
-          model: "demo",
-          temperature: 0.7,
-          max_tokens: 512,
-        });
-        for await (const token of stream) {
-          setMessages((prev) =>
-            prev.map((m) => (m.id === asstMsg.id ? { ...m, content: m.content + token } : m))
-          );
-        }
-      } catch (e: any) {
-        setMessages((prev) =>
-          prev.map((m) => (m.id === asstMsg.id ? { ...m, content: `[오류] ${e.message}` } : m))
-        );
-      } finally {
-        setLoading(false);
-      }
-    }
+2025년에는 **어떻게든 화면을 동작시키는 것**에 집중했습니다. 그 후 웹 API, 데이터 관리, 테스트, 팀 협업을 배우면서 **'실제로 동작한다'와 '올바르게 설계되고 안전하게 검증된다'는 별개의 문제**라는 점을 알게 됐습니다.
 
-    function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        onSend();
-      }
-    }
+2026년에는 5개 학술 동아리가 함께한 연합 해커톤에서 [EIDOS](https://github.com/2026ENDPoinT/team19)의 **백엔드 담당**으로 참여했습니다. 그때는 AI·FE·BE 역할을 나누고, API 계약과 작업 상태, 실패 처리, 저장 및 테스트를 고려하며 협업했습니다.
 
-    return (
-      <div className="min-h-screen flex flex-col items-center px-4 py-8 gap-4">
-        <main className="w-full max-w-2xl flex-1 flex flex-col border rounded-lg p-4">
-          <div ref={listRef} className="flex-1 overflow-y-auto space-y-3 pr-2">
-            {messages.map((m) => (
-              <div
-                key={m.id}
-                className={m.role === "user" ? "text-right" : "text-left"}
-              >
-                <div
-                  className={
-                    "inline-block rounded-lg px-3 py-2 " +
-                    (m.role === "user"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 dark:bg-gray-800")
-                  }
-                >
-                  {m.content || (m.role === "assistant" && loading ? "..." : "")}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 flex items-end gap-2">
-            <textarea
-              className="flex-1 resize-none h-24 border rounded-md p-2"
-              placeholder="메시지를 입력하고 Enter로 전송(Shift+Enter 줄바꿈)"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={onKeyDown}
-            />
-            <button
-              onClick={onSend}
-              disabled={loading || !input.trim()}
-              className="h-10 px-4 rounded-md bg-black text-white disabled:opacity-50"
-            >
-              전송
-            </button>
-          </div>
-        </main>
-      </div>
-    );
-  }
-  ```
+| | 2025 약장수 | 2026 EIDOS |
+| --- | --- | --- |
+| 출발점 | 역할과 방법을 알아 가는 첫 시도 | 역할과 인터페이스를 정한 협업 |
+| 제 관심 | 화면과 기본 기능의 구현 | API, 데이터, 상태, 오류와 검증 |
+| AI 도구 | Cursor에 크게 의지하며 구현 | 도구를 쓰면서도 요구사항·계약·결과를 점검 |
+| 남은 기록 | 코드와 짧은 로컬 시연 영상 | 역할별 문서, 코드, 테스트 및 팀 결정 기록 |
 
-수용기준
-- 메시지 입력 후 Enter 시 바로 사용자 메시지가 표시되고, 어시스턴트 답변이 토큰 단위로 증가
-- 로딩 중 입력 비활성화 또는 시각적 피드백 제공
+[**2025년 첫 해커톤 회고 전문**](docs/retrospective-2025.md)
+
+## 06. 소스 확인과 로컬 실행
+
+```bash
+npm install
+npm run dev
+```
+
+- 의약품 정보 화면: `http://localhost:3000/home`
+- 채팅 화면: `http://localhost:3000/`
+
+**재현 상태:** 위 명령은 당시 프로젝트에 남은 실행 방법입니다. 2026년 환경에서의 정상 실행 여부는 별도 빌드 검증과 구분합니다. 실행해도 의료 판단 용도로 사용해서는 안 됩니다.
+
+## 기록의 원칙
+
+- 2025년 원본 소스와 커밋 이력을 가능한 그대로 보존합니다.
+- 2026년에 작성한 회고, 기술 검토, 검증 기록에는 그 시점을 명확히 표시합니다.
+- 팀원의 기여를 대신 주장하거나, Cursor의 기여를 감추거나, 실제로 연결되지 않은 AI 기능을 구현했다고 쓰지 않습니다.
+- 최초 README는 [보존본](archive/README_before_portfolio.md)에서 볼 수 있습니다. 저장소에 남아 있는 다른 사용 설명서는 **당시 작성된 문서**입니다.
 
 ---
 
-### Step 4. UI 컴포넌트 분리(shadcn/ui 적용)
-- 파일 구성
-  - `components/ChatList.tsx`: 역할별 버블, 자동 스크롤 지원
-  - `components/ChatInput.tsx`: 멀티라인, 단축키, 전송 버튼
-  - `components/Header.tsx`: 새 대화, 설정 열기
-  - `components/SettingsSheet.tsx`: 모델/온도/토큰/시스템 프롬프트
-- 스타일 가이드
-  - 다크모드 지원, 키보드 포커스 링, 접근성 속성(aria-label/role) 적용
-- 페이지에서 컴포넌트 사용하도록 교체
-
-수용기준
-- 모바일/데스크탑 반응형 정상
-- 단축키(Enter/Shift+Enter) 정상
-- 설정 변경 시 다음 요청부터 반영
-
----
-
-### Step 5. 배포(Vercel)
-- 환경 변수 설정
-  - 실제 모델 연동 시(지금은 데모 스트림이므로 생략 가능)
-    - 로컬: `.env.local`
-      - `OPENAI_API_KEY=...` (예시: OpenAI 사용 시)
-      - `DEFAULT_MODEL=openai:gpt-4o-mini` (선택)
-    - Vercel: Project Settings → Environment Variables에 동일 키 추가
-- 빌드/배포
-  ```bash
-  npm run build
-  npm start  # 로컬 프로덕션 확인
-  ```
-  - Vercel에 Git 연동 → `Deploy` 버튼
-- 서버 로그/오류 확인
-  - 스트리밍 정상 동작, 400/500 처리 확인
-
-수용기준
-- 프로덕션 URL에서 입력/스트리밍/반응형/UI 상태 이상 없음
+*2025년 10월의 첫 해커톤을, 2026년 11월에 다시 읽고 정리했습니다.*
