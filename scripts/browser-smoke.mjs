@@ -78,7 +78,7 @@ try {
   const expectedReply = "안녕하세요! 약장수 챗봇입니다. 어떤 증상으로 불편하신가요?";
   await page.waitForFunction((expected) =>
     [...document.querySelectorAll("div")].some((x) =>
-      x.textContent?.trim().replace(/\\s+/g, "") === expected.replace(/\\s+/g, "")
+      x.textContent?.trim().replace(/\s+/g, "") === expected.replace(/\s+/g, "")
     ), expectedReply
   );
   const whitespacePreserved = await page.evaluate((expected) =>
