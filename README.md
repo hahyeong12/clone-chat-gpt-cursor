@@ -1,3 +1,9 @@
+
+
+https://github.com/user-attachments/assets/294468a8-3fbe-4f0e-aff5-115607e62297
+
+
+
 # 약장수 (Yakjangsu)
 
 **2025년 가을 · 첫 해커톤 · 3인 팀 · Next.js / TypeScript / Cursor**
