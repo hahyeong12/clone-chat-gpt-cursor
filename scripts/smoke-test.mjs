@@ -84,7 +84,15 @@ try {
     const body = await response.text();
     assert.ok(body.includes("data: [DONE]"), "missing SSE end marker");
     assert.ok(!body.includes("data: [ERROR]"), "server emitted stream error");
-    return body;
+    // The 2025 app emits one SSE data line per character. Rejoin the data values
+    // before comparing complete Korean phrases; checking raw lines would be false.
+    const assembled = body
+      .split(/\\r?\\n/)
+      .filter((line) => line.startsWith("data: "))
+      .map((line) => line.slice(6))
+      .filter((chunk) => chunk !== "[DONE]")
+      .join("");
+    return assembled;
   }
 
   const greeting = await sendChat("안녕하세요");
